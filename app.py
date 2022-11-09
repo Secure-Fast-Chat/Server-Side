@@ -7,28 +7,32 @@ import struct
 import json
 
 HOST = "127.0.0.1"
-PORT = 6969
+PORT = 8000
 ENCODING_USED = "utf-8"
 
 loggedClients = []
 
 
 
-
-def accept(sock = None):
+def accept(sel, sock = None):
     """Function to accept a new client connection
     """
     conn, addr = sock.accept()
     conn.setblocking(False)
-    message = Message.Message(conn, 'new-client', {})
+    message = Message.Message(conn, 'new-client', {}, sel)
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data=message)
-
+    ##!!
+    print("Accepted Client")
+    ##!!
 
 def service(key, mask):
+    ##!!
+    print("Processing request")
+    ##!!
     sock = key.fileobj
     message =  key.data
-    message.process()
+    message.processTask()
             
 
 def check_valid_uid(uid):
@@ -42,7 +46,7 @@ def check_valid_uid(uid):
 
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     sel = selectors.DefaultSelector()
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.bind((HOST,PORT))
@@ -51,10 +55,11 @@ if __name__ == "main":
     sel.register(lsock, selectors.EVENT_READ, data = None)
     try:
         while True:
+            print("Reached//")
             events = sel.select(timeout = None)
             for key, mask in events:
                 if key.data is None:
-                    accept(key.fileobj)
+                    accept(sel, key.fileobj)
                 else:
                     service(key, mask)
     except KeyboardInterrupt:

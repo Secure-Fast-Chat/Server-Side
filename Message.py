@@ -1,6 +1,8 @@
 import json
 import struct
 import sys
+import DatabaseRequestHandler
+import selectors
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -21,7 +23,7 @@ class Message:
     :type _recvd_msg: bytes
     """
 
-    def __init__(self,conn_socket,task,request):
+    def __init__(self,conn_socket,status,request,sel):
         """Constructor Object
 
         :param conn_socket: Socket which has a connection with client
@@ -31,10 +33,11 @@ class Message:
         :param request: Content to send to server
         :type request: str
         """
-        self.task = task
+        self.status = status
         self.socket = conn_socket
         self.request_content = request
         self._data_to_send = b''
+        self.sel = sel
 
     def _send_data_to_client(self):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
@@ -44,6 +47,7 @@ class Message:
         while left_message:
             bytes_sent = self.socket.send(left_message)
             left_message = left_message[bytes_sent:]
+
         return
 
     def _recv_data_from_client(self,size):
@@ -86,22 +90,116 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        packed_proto_header = self.socket.recv(2)
+        self._recv_data_from_client(2)
+        packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
-        obj = self.socket.recv(json_header_length)
+        self._recv_data_from_client(json_header_length)
+        obj = self._recvd_msg
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
         content_len = json_header['content-length']
-        content_obj = self.socket.recv(content_len)
+        self._recv_data_from_client(content_len)
+        content_obj = self._recvd_msg
         content = json.loads(content_obj.decode(ENCODING_USED))
         if(request == "signupuid"):
+            ##!!
+            print("request is signupuid")
+            ##!!
             self._process_signup_uid(content)
+        if(request == "signuppass"):
+            ##!!
+            print("request is signuppass")
+            ##!!
+            self._process_signup_pass(content)
+        if(request == "login"):
+            ##!!
+            print("request is login")
+            ##!!
+            self._process_login(content)
             
+    def _process_login(self, uid):
+        ## Pending Imlementation
+        #Required: check_login_uid returns token if uid is valid, else returns 0
+        uid_success = DatabaseRequestHandler.check_login_uid(uid)
+        ##
+        if( uid_success != 0 ):
+            self._data_to_send = self._successfully_found_login_uid(uid_success)
+            self._send_data_to_client()
+            packed_proto_header = self.socket.recv(2)
+            json_header_length = struct.unpack('>H', packed_proto_header)[0]
+            obj = self.socket.recv(json_header_length)
+            json_header = json.loads(obj.decode(ENCODING_USED))
+            request = json_header["request"]
+            content_len = json_header['content-length']
+            content_obj = self.socket.recv(content_len)
+            content = json.loads(content_obj.decode(ENCODING_USED))
+            pwd = content
+            ## Pending Implementation
+            #Required: check_login_pwd returns 1 if matched successfully, else returns 0
+            pwd_success = DatabaseRequestHandler.check_login_pwd(uid, pwd)
+            ##
+            if(pwd_success == 1):
+                self.status = "logged_in"
+                self._data_to_send = self._login_successful()
+                self._send_data_to_client()
+            else:
+                self._data_to_send = self._login_failed()
+                self._send_data_to_client()
+        else:
+            self._data_to_send = self._login_uid_not_found()
+            self._send_data_to_client()
+        
+    def _login_failed(self):
+        return struct.pack('>H', 1)
+
+    def _login_successful(self):
+        return struct.pack('>H', 0)
+
+    def _login_uid_not_found(self):
+        global ENCODING_USED
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "uid_found": 0,
+            "content-length": 0
+        }
+        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        proto_header = struct.pack('>H',len(encoded_json_header))
+        return proto_header + encoded_json_header
+
+    def _successfully_found_login_uid(self, token):
+        global ENCODING_USED
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "uid_found": 1,
+            "logintoken": token,
+            "content-length": 0
+        }
+        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        proto_header = struct.pack('>H',len(encoded_json_header))
+        return proto_header + encoded_json_header
+
+    def _process_signup_pass(self, hashedpwd):
+        ## Pending Implememtation
+        #Required: setpass returns 1 if successfully logged in else 0
+        success = DatabaseRequestHandler.setpass(self.request_content["uid"], hashedpwd)
+        ##
+        if(success == 1):
+            self._data_to_send = self._successfully_signed_up()
+            self._send_data_to_client()
+        elif(success == 0):
+            self._data_to_send = self._signup_failed()
+            self._send_data_to_client()
+
+    def _signup_failed():
+        return struct.pack('>H',2)
+    
+    def _successfully_signed_up():
+        return struct.pack('>H',1)
 
     def _process_signup_uid(self,uid):
         ## Pending Implementation
         #Required: checkuid returns key, if uid is available to be used, else returns 0
-        uid_check = checkuid(uid)
+        uid_check = DatabaseRequestHandler.checkuid(uid)
         ##
         if(uid_check == 0):
             self._data_to_send = self._signup_uid_not_avaible()
@@ -110,6 +208,8 @@ class Message:
             key = uid_check
             self._data_to_send = self._signup_uid_available(key) 
             self._send_data_to_client()
+            #Storing uid in socket's data
+            self.request_content["uid"] = uid
         return
 
     def _signup_uid_not_available(self):
