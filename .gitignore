@@ -55,3 +55,6 @@ Temporary Items
 clientvenv/*
 
 .gitignore
+
+__pycache__/*
+*.pyc

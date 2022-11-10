@@ -41,6 +41,7 @@ class Message:
         self._data_to_send = b''
         self.sel = sel
         self.privateKey = ""
+        self.username = "" # Need this to keep track of whom we are signing up etc
 
     def _send_data_to_client(self):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
@@ -182,12 +183,6 @@ class Message:
         #Required: setpass returns 1 if successfully logged in else 0
         success = DatabaseRequestHandler.setpass(self.request_content["uid"], hashedpwd)
         ##
-        if(success == 1):
-            self._data_to_send = self._successfully_signed_up()
-            self._send_data_to_client()
-        elif(success == 0):
-            self._data_to_send = self._signup_failed()
-            self._send_data_to_client()
 
     def _signup_failed():
         return struct.pack('>H',2)
@@ -246,4 +241,11 @@ class Message:
         :type key: str
         """
         box = Box(self.privateKey, client_public_key)
-        password = Box.decrypt(encrypted_pass)
+        password = box.decrypt(encrypted_pass)
+        success = createUser(self.username, password)
+        if success:
+            self._data_to_send = self._successfully_signed_up()
+            self._send_data_to_client()
+        else:
+            self._data_to_send = self._signup_failed()
+            self._send_data_to_client()
