@@ -3,6 +3,8 @@ import struct
 import sys
 import DatabaseRequestHandler
 import selectors
+from nacl.public import PrivateKey, Box
+from db import checkIfUsernameFree, createUser
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -38,6 +40,7 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
+        self.privateKey = ""
 
     def _send_data_to_client(self):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
@@ -102,14 +105,10 @@ class Message:
         content_obj = self._recvd_msg
         content = json.loads(content_obj.decode(ENCODING_USED))
         if(request == "signupuid"):
-            ##!!
             print("request is signupuid")
-            ##!!
             self._process_signup_uid(content)
         if(request == "signuppass"):
-            ##!!
             print("request is signuppass")
-            ##!!
             self._process_signup_pass(content)
         if(request == "login"):
             ##!!
@@ -198,18 +197,21 @@ class Message:
 
     def _process_signup_uid(self,uid):
         ## Pending Implementation
-        #Required: checkuid returns key, if uid is available to be used, else returns 0
-        uid_check = DatabaseRequestHandler.checkuid(uid)
+        #Required: checkuid returns key, if uid is available to be ujed, else returns 0
+        uid_free = checkIfUsernameFree(uid)
         ##
-        if(uid_check == 0):
+        if not uid_free:
             self._data_to_send = self._signup_uid_not_avaible()
             self._send_data_to_client()
         else:
-            key = uid_check
-            self._data_to_send = self._signup_uid_available(key) 
+            privatekey = PrivateKey.generate()
+            self.privateKey = privatekey
+            publickey = privatekey.public_key
+            self._data_to_send = self._signup_uid_available(publickey) 
             self._send_data_to_client()
             #Storing uid in socket's data
             self.request_content["uid"] = uid
+            self.processTask() #Immediately wait for next message, which would contain the password
         return
 
     def _signup_uid_not_available(self):
@@ -223,14 +225,25 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _signup_uid_available(self, key):
+    def _signup_uid_available(self, publickey):
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
             "availability": 1,
-            "key": key,
+            "key": publickey,
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
+    
+    def _process_signup_pass(self, encrypted_pass:str, client_public_key:str):
+        """Process the command for signing up the user and storing the password
+
+        :param encrypted_pass: The encoded password
+        :type encoded_pass: str
+        :param client_public_key: Public key of the client 
+        :type key: str
+        """
+        box = Box(self.privateKey, client_public_key)
+        password = Box.decrypt(encrypted_pass)
