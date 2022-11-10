@@ -110,7 +110,7 @@ class Message:
             self._process_signup_uid(content)
         if(request == "signuppass"):
             print("request is signuppass")
-            self._process_signup_pass(content)
+            self._process_signup_pass(content["password"], content["key"]) # content will be a dictionary
         if(request == "login"):
             ##!!
             print("request is login")
@@ -177,12 +177,6 @@ class Message:
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
-
-    def _process_signup_pass(self, hashedpwd):
-        ## Pending Implememtation
-        #Required: setpass returns 1 if successfully logged in else 0
-        success = DatabaseRequestHandler.setpass(self.request_content["uid"], hashedpwd)
-        ##
 
     def _signup_failed():
         return struct.pack('>H',2)
