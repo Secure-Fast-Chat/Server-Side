@@ -5,6 +5,7 @@ import socket
 import types
 import struct
 import json
+from nacl.public import PrivateKey, Box
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -19,9 +20,14 @@ def accept(sel, sock = None):
     """
     conn, addr = sock.accept()
     conn.setblocking(False)
-    message = Message.Message(conn, 'new-client', {}, sel)
+    privatekey = PrivateKey.generate()
+    publickey = privatekey.public_key
+    message = Message.Message(conn, 'keyex', {"key": publickey}, sel)
+    clientPublicKey = message.keyex()
+
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    sel.register(conn, events, data=message)
+    box = Box(privatekey, clientPublicKey)
+    sel.register(conn, events, data={"box":box})
     ##!!
     print("Accepted Client")
     ##!!
@@ -31,17 +37,10 @@ def service(key, mask):
     print("Processing request")
     ##!!
     sock = key.fileobj
-    message =  key.data
-    message.processTask()
+    # message =  key.data
+    # message.processTask()
             
 
-def check_valid_uid(uid):
-    """Sends Uid to database and checks if it is valid or not
-
-    :return: 1 if valid, 0 if invalid
-    :rtype: int
-    """
-    pass
 
 
 

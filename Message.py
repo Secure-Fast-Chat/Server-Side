@@ -47,10 +47,11 @@ class Message:
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
 
         """
-        left_message = self._data_to_send
+        left_message = self.sel.data["box"].encode(self._data_to_send)
+
         while left_message:
-            bytes_sent = self.socket.send(left_message)
-            left_message = left_message[bytes_sent:]
+            bytes_sent = self.socket.sendall(left_message)
+            # left_message = left_message[bytes_sent:]
 
         return
 
@@ -61,7 +62,7 @@ class Message:
         :type size: int
         """
 
-        self._recvd_msg = self.socket.recv(size)
+        self._recvd_msg = self.sel.data["box"].decode(self.socket.recv(size))
         return
 
     def _json_encode(self, obj, encoding):
@@ -94,7 +95,7 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        self._recv_data_from_client(2)
+        self._recv_data_from_client(2) # TODO: This only works when client makes the first request, what about when we are sending the message
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
@@ -110,13 +111,44 @@ class Message:
             self._process_signup_uid(content)
         if(request == "signuppass"):
             print("request is signuppass")
-            self._process_signup_pass(content["password"], content["key"]) # content will be a dictionary
+            self._process_signup_pass(content["username"])
         if(request == "login"):
             ##!!
             print("request is login")
             ##!!
             self._process_login(content)
-            
+    
+    def keyex(self)->str:
+        """Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client
+
+        :return: public key of the client
+        :rtype: str
+        """
+        self._recv_data_from_client(2) # TODO: This only works when client makes the first request, what about when we are sending the message
+        packed_proto_header = self._recvd_msg
+        json_header_length = struct.unpack('>H', packed_proto_header)[0]
+        self._recv_data_from_client(json_header_length)
+        obj = self._recvd_msg
+        json_header = json.loads(obj.decode(ENCODING_USED))
+        request = json_header["request"]
+        if(request == "keyex"):
+            clientPublicKey = json_header['key']
+            publickey = self.request_content['key']
+            jsonheader = {
+                "byteorder": sys.byteorder,
+                "request" : 'keyex',
+                "key": publickey,
+                "content-encoding" : ENCODING_USED,
+                
+            }
+            encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+            proto_header = struct.pack('>H',len(encoded_json_header))
+            # Command to use for unpacking of proto_header: 
+            # struct.unpack('>H',proto_header)[0]
+            self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
+            self._send_data_to_server()
+            return clientPublicKey
+ 
     def _process_login(self, uid):
         ## Pending Imlementation
         #Required: check_login_uid returns token if uid is valid, else returns 0
@@ -193,10 +225,7 @@ class Message:
             self._data_to_send = self._signup_uid_not_avaible()
             self._send_data_to_client()
         else:
-            privatekey = PrivateKey.generate()
-            self.privateKey = privatekey
-            publickey = privatekey.public_key
-            self._data_to_send = self._signup_uid_available(publickey) 
+            self._data_to_send = self._signup_uid_available() 
             self._send_data_to_client()
             #Storing uid in socket's data
             self.request_content["uid"] = uid
@@ -214,12 +243,11 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _signup_uid_available(self, publickey):
+    def _signup_uid_available(self):
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
             "availability": 1,
-            "key": publickey,
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
@@ -234,7 +262,7 @@ class Message:
         :param client_public_key: Public key of the client 
         :type key: str
         """
-        box = Box(self.privateKey, client_public_key)
+        box = self.sel.data["box"]
         password = box.decrypt(encrypted_pass)
         success = createUser(self.username, password)
         if success:
