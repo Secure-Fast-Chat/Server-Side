@@ -32,25 +32,31 @@ def checkIfUsernameFree(username: str) -> bool:
     else:
         return False
 
-def createUser(username:str, password:str)->None:
-    """Adds a user with the given username and password to the database. Assumes that the checkIfUsernameFree has already been called before. We hash the password here. 
+def createUser(username:str, password:str)->bool:
+    """Adds a user with the given username and password to the database. Assumes that the checkIfUsernameFree has already been called before. We hash the password here. Returns true if the user generation happened without any error
 
     :param username: username
     :type username: str
     :param password: password (hashed)
     :type password: str
+    :return: Whether the user creation happened succesfully
+    :rtype: bool
     """
-    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    try:
+        conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
 
-    cur = conn.cursor()
-    ph = PasswordHasher()
-    hashedPassword = ph.hash(password) # Salts and hashes
-    cur.execute("INSERT INTO {users_table_name} (NAME, PASSWORD) \
-      VALUES ({username}, {hashedPassword})")
+        cur = conn.cursor()
+        ph = PasswordHasher()
+        hashedPassword = ph.hash(password) # Salts and hashes
+        cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD) \
+        VALUES ({username}, {hashedPassword})")
 
-    conn.commit()
-    conn.close()
-    return
+        conn.commit()
+        conn.close()
+    except:
+        return False
+
+    return True
 
 def loginUsername(username: str, password: str)->bool:
     """Checks if a given username password pair is present in the db
@@ -95,7 +101,7 @@ def storeMessageInDb(sender: str, receiver: str, message: str):
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
 
-    cur.execute("INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
+    cur.execute(f"INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
       VALUES ({sender}, {receiver}, {message})")
 
     conn.commit()
