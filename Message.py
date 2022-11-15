@@ -153,7 +153,6 @@ class Message:
         else:
             ##Pending Implementation
             DatabaseRequestHandler.storemsg(rcvr_uid, self._data_to_send)
-            
 
     def _send_rcvr_key(self, rcvr_uid):
 
@@ -171,9 +170,6 @@ class Message:
         proto_header = struct.pack('>H', len(encoded_json_header))
         self._data_to_send = proto_header + encoded_json_header
         self._send_data_to_client()
-
-
-        
 
     def keyex(self)->str:
         """Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client
