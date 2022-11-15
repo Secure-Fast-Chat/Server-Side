@@ -58,7 +58,7 @@ def createUser(username:str, password:str)->bool:
 
     return True
 
-def loginUsername(username: str, password: str)->bool:
+def login(username: str, password: str)->bool:
     """Checks if a given username password pair is present in the db
 
     :param username: username

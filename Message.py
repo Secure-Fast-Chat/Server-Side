@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser
+from db import checkIfUsernameFree, createUser, login
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -254,7 +254,7 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _process_signup_pass(self, encrypted_pass:str, client_public_key:str):
+    def _process_signup_pass(self, encrypted_pass:str):
         """Process the command for signing up the user and storing the password
 
         :param encrypted_pass: The encoded password
