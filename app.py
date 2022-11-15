@@ -17,6 +17,7 @@ loggedClients = []
 def accept(sel, sock = None):
     """Function to accept a new client connection
     """
+    print(sock)
     conn, addr = sock.accept()
     conn.setblocking(False)
     message = Message.Message(conn, 'new-client', {}, sel)
@@ -57,6 +58,7 @@ if __name__ == "__main__":
         while True:
             print("Reached//")
             events = sel.select(timeout = None)
+            print(events)
             for key, mask in events:
                 if key.data is None:
                     accept(sel, key.fileobj)

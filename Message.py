@@ -57,7 +57,9 @@ class Message:
         :type size: int
         """
 
-        self._recvd_msg = self.socket.recv(size)
+        self._recvd_msg = b''
+        while len(self._recvd_msg) < size:
+            self._recvd_msg += self.socket.recv(size-len(self._recvd_msg))
         return
 
     def _json_encode(self, obj, encoding):
@@ -95,12 +97,16 @@ class Message:
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
         obj = self._recvd_msg
+        print(obj)
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
         content_len = json_header['content-length']
         self._recv_data_from_client(content_len)
         content_obj = self._recvd_msg
-        content = json.loads(content_obj.decode(ENCODING_USED))
+        ###################################################################
+        ###################### ByteOrder Things ###########################
+        ###################################################################
+        content = content_obj.decode(ENCODING_USED)
         if(request == "signupuid"):
             ##!!
             print("request is signupuid")
@@ -181,7 +187,7 @@ class Message:
     def _process_signup_pass(self, hashedpwd):
         ## Pending Implememtation
         #Required: setpass returns 1 if successfully logged in else 0
-        success = DatabaseRequestHandler.setpass(self.request_content["uid"], hashedpwd)
+        success = DatabaseRequestHandler.createUser(self.request_content["uid"], hashedpwd)
         ##
         if(success == 1):
             self._data_to_send = self._successfully_signed_up()
@@ -199,7 +205,7 @@ class Message:
     def _process_signup_uid(self,uid):
         ## Pending Implementation
         #Required: checkuid returns key, if uid is available to be used, else returns 0
-        uid_check = DatabaseRequestHandler.checkuid(uid)
+        uid_check = DatabaseRequestHandler.checkIfUsernameFree(uid)
         ##
         if(uid_check == 0):
             self._data_to_send = self._signup_uid_not_avaible()

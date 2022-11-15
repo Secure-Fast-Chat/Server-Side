@@ -42,7 +42,7 @@ def createUser(username:str, password:str)->None:
     conn.close()
     return
 
-def loginUsername(username: str, password: str, salt:str)->str:
+def loginUsername(username: str, password: str)->str:
     """Checks if a given username is present in the 
 
     :param username: _description_
