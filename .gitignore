@@ -52,4 +52,9 @@ Temporary Items
 *.icloud
 
 #virtual env
-virtualEnvironment/*
+clientvenv/*
+
+.gitignore
+
+__pycache__/*
+*.pyc
