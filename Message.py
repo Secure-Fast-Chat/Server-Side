@@ -42,6 +42,8 @@ class Message:
         self.sel = sel
         self.privateKey = ""
         self.username = "" # Need this to keep track of whom we are signing up etc
+        self.online = 0
+
 
     def _send_data_to_client(self):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
@@ -67,6 +69,12 @@ class Message:
         self._recvd_msg = self.sel.data["box"].decode(self._recvd_msg)
         return
 
+    def _send_msg_to_reciever(self, rcvr_sock):
+        """Function to send message to a reciever
+        """
+        left_message = self.sel.data["box"].encode(self._data_to_send)
+        rcvr_sock.sendall(left_message)
+
     def _json_encode(self, obj, encoding):
         """Function to encode dictionary to bytes object
 
@@ -91,7 +99,7 @@ class Message:
 
         return json.load(obj.decode(encoding), ensure_ascii=False)
 
-    def processTask(self):
+    def processTask(self, loggedClients):
         """ Processes the task to do
 
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
@@ -123,7 +131,50 @@ class Message:
             print("request is login")
             ##!!
             self._process_login(content)
-    
+        if(request == "get-key"):
+            self._send_rcvr_key(content["rcvr-uid"])
+        if(request == "send-msg"):
+            rcvr_uid = json_header["rcvr-uid"]
+            msg_type = json_header["content-type"]
+            self._send_msg(rcvr_uid, msg_type, content, loggedClients)
+
+    def _send_msg(self, rcvr_uid, msg_type, content, loggedClients):
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "content-len": len(content),
+            "sender": self.username,
+            "content-type": msg_type
+        }
+        encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+        proto_header = struct.pack('>H', len(encoded_json_header))
+        self._data_to_send = proto_header + encoded_json_header + content
+        if(rcvr_uid in loggedClients.keys()):
+            self._send_msg_to_reciever(loggedClients[rcvr_uid])
+        else:
+            ##Pending Implementation
+            DatabaseRequestHandler.storemsg(rcvr_uid, self._data_to_send)
+            
+
+    def _send_rcvr_key(self, rcvr_uid):
+
+        ##Pending Implementation
+        # check_valid_uid returns 1 if the uid is valid else returns 0
+        publickey = -1
+        if(DatabaseRequestHandler.check_valid_uid(rcvr_uid)):
+            publickey = DatabaseRequestHandler.get_pub_key(rcvr_uid)
+        ##
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "key": publickey
+        }
+        encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+        proto_header = struct.pack('>H', len(encoded_json_header))
+        self._data_to_send = proto_header + encoded_json_header
+        self._send_data_to_client()
+
+
+        
+
     def keyex(self)->str:
         """Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client
 
@@ -152,7 +203,7 @@ class Message:
             # Command to use for unpacking of proto_header: 
             # struct.unpack('>H',proto_header)[0]
             self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
-            self._send_data_to_server()
+            self._send_data_to_client()
             return clientPublicKey
  
     def _process_login(self, uid):
@@ -178,6 +229,8 @@ class Message:
             ##
             if(pwd_success == 1):
                 self.status = "logged_in"
+                ## online is 1 when user is logged in
+                self.online = 1
                 self._data_to_send = self._login_successful()
                 self._send_data_to_client()
             else:
@@ -224,7 +277,7 @@ class Message:
 
     def _process_signup_uid(self,uid):
         ## Pending Implementation
-        #Required: checkuid returns key, if uid is available to be ujed, else returns 0
+        #Required: checkuid returns key, if uid is available to be used, else returns 0
         uid_free = checkIfUsernameFree(uid)
         ##
         if not uid_free:
@@ -234,7 +287,7 @@ class Message:
             self._data_to_send = self._signup_uid_available() 
             self._send_data_to_client()
             #Storing uid in socket's data
-            self.request_content["uid"] = uid
+            self.username = uid
             self.processTask() #Immediately wait for next message, which would contain the password
         return
 
@@ -277,3 +330,12 @@ class Message:
         else:
             self._data_to_send = self._signup_failed()
             self._send_data_to_client()
+
+    def isOnline(self):
+        if(self.online):
+            return 1
+        else:
+            return 0
+
+    def get_uid_sock(self):
+        return (self.username, self.socket)

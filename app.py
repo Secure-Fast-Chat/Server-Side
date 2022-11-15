@@ -38,10 +38,16 @@ def service(key, mask):
     print("Processing request")
     ##!!
     sock = key.fileobj
-    # message =  key.data
-    # message.processTask()
-            
-
+    message =  key.data
+    message.processTask(loggedClients)
+    uid, sock = message.isOnline()
+    if(message.isOnline()):
+        uid, sock = message.get_uid_sock()
+        loggedClients[uid] = sock
+    else:
+        uid, sock = message.get_uid_sock()
+        if(uid!=""):
+            del loggedClients[uid]
 
 
 
