@@ -1,0 +1,86 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter {\sphinxsymbolsname}
+  \item \spxentry{\_json\_decode()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_json\_encode()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_login\_failed()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_login\_successful()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_login\_uid\_not\_found()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_process\_login()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_process\_signup\_pass()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_process\_signup\_uid()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_recv\_data\_from\_client()}\spxextra{Message.Message method}, \hyperpage{1}
+  \item \spxentry{\_send\_data\_to\_client()}\spxextra{Message.Message method}, \hyperpage{1}
+  \item \spxentry{\_send\_msg()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_send\_msg\_to\_reciever()}\spxextra{Message.Message method}, \hyperpage{1}
+  \item \spxentry{\_send\_rcvr\_key()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_signup\_failed()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_signup\_uid\_available()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_signup\_uid\_not\_available()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_successfully\_found\_login\_uid()}\spxextra{Message.Message method}, 
+		\hyperpage{2}
+  \item \spxentry{\_successfully\_signed\_up()}\spxextra{Message.Message method}, \hyperpage{2}
+
+  \indexspace
+  \bigletter A
+  \item \spxentry{accept()}\spxextra{in module startServer}, \hyperpage{4}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{check\_login\_pwd()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
+  \item \spxentry{check\_login\_uid()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
+  \item \spxentry{checkIfUsernameFree()}\spxextra{in module db}, \hyperpage{3}
+  \item \spxentry{checkuid()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
+  \item \spxentry{createUser()}\spxextra{in module db}, \hyperpage{3}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{DatabaseRequestHandler}
+    \subitem \spxentry{module}, \hyperpage{1}
+  \item \spxentry{db}
+    \subitem \spxentry{module}, \hyperpage{3}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{get\_uid\_sock()}\spxextra{Message.Message method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{isOnline()}\spxextra{Message.Message method}, \hyperpage{3}
+
+  \indexspace
+  \bigletter K
+  \item \spxentry{keyex()}\spxextra{Message.Message method}, \hyperpage{2}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{login()}\spxextra{in module db}, \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{Message}
+    \subitem \spxentry{module}, \hyperpage{1}
+  \item \spxentry{Message}\spxextra{class in Message}, \hyperpage{1}
+  \item \spxentry{module}
+    \subitem \spxentry{DatabaseRequestHandler}, \hyperpage{1}
+    \subitem \spxentry{db}, \hyperpage{3}
+    \subitem \spxentry{Message}, \hyperpage{1}
+    \subitem \spxentry{startServer}, \hyperpage{4}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{processTask()}\spxextra{Message.Message method}, \hyperpage{2}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{service()}\spxextra{in module startServer}, \hyperpage{4}
+  \item \spxentry{setpass()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
+  \item \spxentry{startServer}
+    \subitem \spxentry{module}, \hyperpage{4}
+  \item \spxentry{storeMessageInDb()}\spxextra{in module db}, \hyperpage{3}
+
+\end{sphinxtheindex}

@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Message module &#8212; SecureFastChat Server Program  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="db module" href="db.html" />
+    <link rel="prev" title="DatabaseRequestHandler module" href="DatabaseRequestHandler.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Message">
+<span id="message-module"></span><h1>Message module<a class="headerlink" href="#module-Message" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="Message.Message">
+<em class="property">class </em><code class="sig-prename descclassname">Message.</code><code class="sig-name descname">Message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_socket</span></em>, <em class="sig-param"><span class="n">status</span></em>, <em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">sel</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task</strong> (<em>str</em>) – Task to be done. It can have the values signup, login, send_message</p></li>
+<li><p><strong>socket</strong> (<em>socket.socket</em>) – The socket used for connection with Server</p></li>
+<li><p><strong>request_content</strong> (<em>dict</em>) – Content to include in the request to send to server</p></li>
+<li><p><strong>_data_to_send</strong> (<em>bytes</em>) – Contains the data to send to the server</p></li>
+<li><p><strong>_recvd_msg</strong> (<em>bytes</em>) – Content received from server is stored here</p></li>
+</ul>
+</dd>
+</dl>
+<p>Constructor Object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conn_socket</strong> (<em>socket.socket</em>) – Socket which has a connection with client</p></li>
+<li><p><strong>task</strong> (<em>str</em>) – Task to do. It can have values: login, signup, send_message</p></li>
+<li><p><strong>request</strong> (<em>str</em>) – Content to send to server</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="Message.Message._send_data_to_client">
+<code class="sig-name descname">_send_data_to_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_data_to_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to send the string to the client. It sends content of _send_data_to_client to the client</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._recv_data_from_client">
+<code class="sig-name descname">_recv_data_from_client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._recv_data_from_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em>) – Length of content to recieve from server</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._send_msg_to_reciever">
+<code class="sig-name descname">_send_msg_to_reciever</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_sock</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_msg_to_reciever" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to send message to a reciever</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._json_encode">
+<code class="sig-name descname">_json_encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">encoding</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._json_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to encode dictionary to bytes object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>dict</em>) – dictionary to encode</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – Encoding to use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Encoded obj</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._json_decode">
+<code class="sig-name descname">_json_decode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">encoding</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._json_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to decode bytes object to dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>bytes</em>) – Encoded json data</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – Encoding used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Decoded json object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>json</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.processTask">
+<code class="sig-name descname">processTask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loggedClients</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.processTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes the task to do</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._send_msg">
+<code class="sig-name descname">_send_msg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span></em>, <em class="sig-param"><span class="n">msg_type</span></em>, <em class="sig-param"><span class="n">content</span></em>, <em class="sig-param"><span class="n">loggedClients</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._send_rcvr_key">
+<code class="sig-name descname">_send_rcvr_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_rcvr_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.keyex">
+<code class="sig-name descname">keyex</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#Message.Message.keyex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>public key of the client</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._process_login">
+<code class="sig-name descname">_process_login</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_login" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._login_failed">
+<code class="sig-name descname">_login_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._login_successful">
+<code class="sig-name descname">_login_successful</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_successful" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._login_uid_not_found">
+<code class="sig-name descname">_login_uid_not_found</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_uid_not_found" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._successfully_found_login_uid">
+<code class="sig-name descname">_successfully_found_login_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._successfully_found_login_uid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_failed">
+<code class="sig-name descname">_signup_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._successfully_signed_up">
+<code class="sig-name descname">_successfully_signed_up</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._successfully_signed_up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._process_signup_uid">
+<code class="sig-name descname">_process_signup_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_signup_uid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_uid_not_available">
+<code class="sig-name descname">_signup_uid_not_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_uid_not_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_uid_available">
+<code class="sig-name descname">_signup_uid_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_uid_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._process_signup_pass">
+<code class="sig-name descname">_process_signup_pass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">encrypted_pass</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_signup_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the command for signing up the user and storing the password</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encrypted_pass</strong> – The encoded password</p></li>
+<li><p><strong>client_public_key</strong> – Public key of the client</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.isOnline">
+<code class="sig-name descname">isOnline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.isOnline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.get_uid_sock">
+<code class="sig-name descname">get_uid_sock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.get_uid_sock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SecureFastChat Server Program</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Server-Side</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="DatabaseRequestHandler.html">DatabaseRequestHandler module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Message module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db.html">db module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="startServer.html">startServer module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">Server-Side</a><ul>
+      <li>Previous: <a href="DatabaseRequestHandler.html" title="previous chapter">DatabaseRequestHandler module</a></li>
+      <li>Next: <a href="db.html" title="next chapter">db module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Khushang Singla, Mridul Agarwal, Arhaan Ahmad.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/Message.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
