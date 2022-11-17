@@ -45,18 +45,20 @@ class Message:
         self.online = 0
 
 
-    def _send_data_to_client(self):
+    def _send_data_to_client(self, encrypted=True):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
 
         """
-        left_message = self.sel.data["box"].encode(self._data_to_send)
-
+        if encrypted:
+            left_message = self.sel.data["box"].encode(self._data_to_send)
+        else:
+            left_message = self._data_to_send
         self.socket.sendall(left_message)
         # left_message = left_message[bytes_sent:]
 
         return
 
-    def _recv_data_from_client(self,size):
+    def _recv_data_from_client(self,size, encrypted=True):
         """ Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.
 
         :param size: Length of content to recieve from server
@@ -66,7 +68,8 @@ class Message:
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
             self._recvd_msg += self.socket.recv(size-len(self._recvd_msg))
-        self._recvd_msg = self.sel.data["box"].decode(self._recvd_msg)
+        if encrypted:
+            self._recvd_msg = self.sel.data["box"].decode(self._recvd_msg)
         return
 
     def _send_msg_to_reciever(self, rcvr_sock):
@@ -174,13 +177,13 @@ class Message:
     def keyex(self)->str:
         """Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client
 
-        :return: public key of the client
+        :return: public key of the client, encoded to base64
         :rtype: str
         """
-        self._recv_data_from_client(2) # TODO: This only works when client makes the first request, what about when we are sending the message
+        self._recv_data_from_client(2, False) 
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
-        self._recv_data_from_client(json_header_length)
+        self._recv_data_from_client(json_header_length, False)
         obj = self._recvd_msg
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
@@ -199,7 +202,7 @@ class Message:
             # Command to use for unpacking of proto_header: 
             # struct.unpack('>H',proto_header)[0]
             self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
-            self._send_data_to_client()
+            self._send_data_to_client(encrypted=False)
             return clientPublicKey
  
     def _process_login(self, uid):

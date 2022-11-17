@@ -6,7 +6,8 @@ import types
 import struct
 import json
 from nacl.public import PrivateKey, Box
-
+import nacl
+from nacl.encoding import Base64Encoder
 HOST = "127.0.0.1"
 PORT = 8000
 ENCODING_USED = "utf-8"
@@ -23,8 +24,8 @@ def accept(sel, sock = None):
     conn.setblocking(False)
     privatekey = PrivateKey.generate()
     publickey = privatekey.public_key
-    message = Message.Message(conn, 'keyex', {"key": publickey}, sel)
-    clientPublicKey = message.keyex()
+    message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, sel)
+    clientPublicKey = nacl.public.PublicKey(message.keyex(), encoder=Base64Encoder)
 
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     box = Box(privatekey, clientPublicKey)
