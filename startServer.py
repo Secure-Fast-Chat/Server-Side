@@ -21,14 +21,18 @@ def accept(sel, sock):
     """
     print(f"{sock=}")
     conn, addr = sock.accept()
-    conn.setblocking(False)
+    print(f"Connected by {addr}")
+    
     privatekey = PrivateKey.generate()
     publickey = privatekey.public_key
     message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, sel)
-    clientPublicKey = nacl.public.PublicKey(message.keyex(), encoder=Base64Encoder)
 
-    events = selectors.EVENT_READ | selectors.EVENT_WRITE
+    clientPublicKey = nacl.public.PublicKey(message.keyex(), encoder=Base64Encoder)
+    print(f"Keys Exchanged. client public key = {clientPublicKey}")
+    print(f"My public key is {publickey}")
+    events = selectors.EVENT_READ
     box = Box(privatekey, clientPublicKey)
+    conn.setblocking(False)
     sel.register(conn, events, data={"box":box})
     ##!!
     print("Accepted Client")
