@@ -59,7 +59,7 @@ def createUser(username:str, password:str)->bool:
     return True
 
 
-def login(username: str, password: str)->bool:
+def db_login(username: str, password: str)->bool:
     """Checks if a given username password pair is present in the db
 
     :param username: username
@@ -81,7 +81,7 @@ def login(username: str, password: str)->bool:
     else:
         ph = PasswordHasher()
         try:
-            ph.verify(names[0][0], password)
+            return ph.verify(names[0][0], password)
             # TODO Update password if needs rehashing https://argon2-cffi.readthedocs.io/en/stable/api.html
         except VerifyMismatchError:
             return False # Password did not match
