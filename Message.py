@@ -229,6 +229,7 @@ class Message:
             ## online is 1 when user is logged in
             self.online = 1
             self._data_to_send = self._login_successful()
+            self.sel.data["username"] = username
             self._send_data_to_client()
         else:
             self._data_to_send = self._login_failed()
@@ -236,7 +237,6 @@ class Message:
         
     def _login_failed(self):
         print("Login failed")
-        breakpoint()
         return struct.pack('>H', 1)
 
     def _login_successful(self):
