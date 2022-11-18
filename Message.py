@@ -40,10 +40,18 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
-        self.privateKey = ""
         self.username = "" # Need this to keep track of whom we are signing up etc
         self.online = 0
 
+    @classmethod 
+    def fromSelKey(cls, selectorKey):
+        status = 0
+        socket = selectorKey.fileObj
+        request_content=""
+        _data_to_send=b''
+        sel=selectorKey
+        online=0
+        return cls(socket, 0, request_content, sel)
 
     def _send_data_to_client(self, encrypted=True):
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client

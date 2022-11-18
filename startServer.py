@@ -39,7 +39,7 @@ def service(key, mask):
     print("Processing request")
     ##!!
     sock = key.fileobj
-    message =  key.data
+    message =  Message.Message.fromSelKey(key)
     message.processTask(loggedClients)
     uid, sock = message.isOnline()
     if(message.isOnline()):
