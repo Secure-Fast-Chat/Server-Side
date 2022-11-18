@@ -2,13 +2,13 @@ import Message
 import psycopg2
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError 
-dbName = "MyDB"
+dbName = "mydb"
 
 users_table_name = "Users"
 messages_table_name = "Messages"
 
 # Assuming the db passwords etc are the same.
-dbUser = "arhaan"
+dbUser = "fasty"
 dbPass = "pass123"
 dbHost = "127.0.0.1"
 dbPort = "5432"
@@ -23,7 +23,7 @@ def checkIfUsernameFree(username: str) -> bool:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        SELECT * FROM {users_table_name} WHERE NAME == {username}
+        SELECT * FROM {users_table_name} WHERE NAME = '{username}'
     ''')
     names = cur.fetchall()
     conn.close()
@@ -49,7 +49,7 @@ def createUser(username:str, password:str)->bool:
         ph = PasswordHasher()
         hashedPassword = ph.hash(password) # Salts and hashes
         cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD) \
-        VALUES ({username}, {hashedPassword})")
+        VALUES (\'{username}\', \'{hashedPassword}\')")
 
         conn.commit()
         conn.close()
@@ -72,7 +72,7 @@ def login(username: str, password: str)->bool:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        SELECT PASSWORD FROM {users_table_name} WHERE NAME == {username}
+        SELECT PASSWORD FROM {users_table_name} WHERE NAME = \'{username}\'
     ''')
     names = cur.fetchall()
     conn.close()
@@ -103,7 +103,7 @@ def storeMessageInDb(sender: str, receiver: str, message: str):
     cur = conn.cursor()
 
     cur.execute(f"INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
-      VALUES ({sender}, {receiver}, {message})")
+      VALUES (\'{sender}\', \'{receiver}\', \'{message}\')")
 
     conn.commit()
     conn.close()
