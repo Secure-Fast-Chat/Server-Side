@@ -48,12 +48,12 @@ def createUser(username:str, password:str)->bool:
         cur = conn.cursor()
         ph = PasswordHasher()
         hashedPassword = ph.hash(password) # Salts and hashes
-        cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD) \
-        VALUES (\'{username}\', \'{hashedPassword}\')")
+        cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD) VALUES (\'{username}\', \'{hashedPassword}\')")
 
         conn.commit()
         conn.close()
-    except:
+    except Exception as e:
+        print(e)
         return False
 
     return True
