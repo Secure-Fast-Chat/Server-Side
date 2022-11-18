@@ -57,14 +57,14 @@ class Message:
         """ Function to send the string to the client. It sends content of _send_data_to_client to the client
 
         """
-        if encrypted:
-            left_message = self.sel.data["box"].encode(self._data_to_send)
-        else:
-            left_message = self._data_to_send
+        left_message = self._data_to_send
         self.socket.sendall(left_message)
         # left_message = left_message[bytes_sent:]
 
         return
+
+    def encrypt(self, data):
+        return self.sel.data["box"].encrypt(data)
 
     def _recv_data_from_client(self,size, encrypted=True):
         """ Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.
@@ -77,13 +77,13 @@ class Message:
         while len(self._recvd_msg) < size:
             self._recvd_msg += self.socket.recv(size-len(self._recvd_msg))
         if encrypted:
-            self._recvd_msg = self.sel.data["box"].decode(self._recvd_msg)
+            self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
         return
 
     def _send_msg_to_reciever(self, rcvr_sock):
         """Function to send message to a reciever
         """
-        left_message = self.sel.data["box"].encode(self._data_to_send)
+        left_message = self.sel.data["box"].encrypt(self._data_to_send)
         rcvr_sock.sendall(left_message)
 
     def _json_encode(self, obj, encoding):
@@ -110,13 +110,13 @@ class Message:
 
         return json.load(obj.decode(encoding), ensure_ascii=False)
 
-    def processTask(self, loggedClients):
+    def processTask(self, loggedClients=[]):
         """ Processes the task to do
 
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        self._recv_data_from_client(2) # TODO: This only works when client makes the first request, what about when we are sending the message
+        self._recv_data_from_client(2, False) 
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
@@ -136,7 +136,7 @@ class Message:
             self._process_signup_uid(content)
         if(request == "signuppass"):
             print("request is signuppass")
-            self._process_signup_pass(content["username"])
+            self._process_signup_pass(content)
         if(request == "login"):
             ##!!
             print("request is login")
@@ -261,8 +261,9 @@ class Message:
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
         proto_header = struct.pack('>H',len(encoded_json_header))
-        return proto_header + encoded_json_header
+        return proto_header +encoded_json_header
 
     def _successfully_found_login_uid(self, token):
         global ENCODING_USED
@@ -273,8 +274,9 @@ class Message:
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
         proto_header = struct.pack('>H',len(encoded_json_header))
-        return proto_header + encoded_json_header
+        return proto_header +encoded_json_header
 
     def _signup_failed():
         return struct.pack('>H',2)
@@ -286,16 +288,19 @@ class Message:
         ## Pending Implementation
         #Required: checkuid returns key, if uid is available to be used, else returns 0
         uid_free = checkIfUsernameFree(uid)
+        print("Checking if UID is free")
         ##
         if not uid_free:
+            print("Not free")
             self._data_to_send = self._signup_uid_not_avaible()
             self._send_data_to_client()
         else:
+            print("Free")
             self._data_to_send = self._signup_uid_available() 
             self._send_data_to_client()
             #Storing uid in socket's data
             self.username = uid
-            self.processTask() #Immediately wait for next message, which would contain the password
+            # self.processTask() #Immediately wait for next message, which would contain the password
         return
 
     def _signup_uid_not_available(self):
@@ -306,8 +311,9 @@ class Message:
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
         proto_header = struct.pack('>H',len(encoded_json_header))
-        return proto_header + encoded_json_header
+        return proto_header +encoded_json_header
     
     def _signup_uid_available(self):
         global ENCODING_USED
@@ -317,19 +323,17 @@ class Message:
             "content-length": 0
         }
         encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _process_signup_pass(self, encrypted_pass:str):
+    def _process_signup_pass(self, password:str):
         """Process the command for signing up the user and storing the password
 
-        :param encrypted_pass: The encoded password
-        :type encoded_pass: str
-        :param client_public_key: Public key of the client 
-        :type key: str
+        :param password: The password
+        :type password: str
         """
         box = self.sel.data["box"]
-        password = box.decrypt(encrypted_pass)
         success = createUser(self.username, password)
         if success:
             self._data_to_send = self._successfully_signed_up()
