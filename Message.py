@@ -40,7 +40,10 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
-        self.username = "" # Need this to keep track of whom we are signing up etc
+        try:
+            self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
+        except:
+            self.username = ""
         self.online = 0
 
     @classmethod 
@@ -50,6 +53,7 @@ class Message:
         request_content=""
         _data_to_send=b''
         sel=selectorKey
+        
         online=0
         return cls(socket, 0, request_content, sel)
 
@@ -278,10 +282,12 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header +encoded_json_header
 
-    def _signup_failed():
+    def _signup_failed(self):
+        print("Signup failes")
         return struct.pack('>H',2)
     
-    def _successfully_signed_up():
+    def _successfully_signed_up(self):
+        print("Signup worked")
         return struct.pack('>H',1)
 
     def _process_signup_uid(self,uid):
@@ -296,6 +302,7 @@ class Message:
             self._send_data_to_client()
         else:
             print("Free")
+            self.sel.data["username"] = uid
             self._data_to_send = self._signup_uid_available() 
             self._send_data_to_client()
             #Storing uid in socket's data
