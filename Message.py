@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, login
+from db import checkIfUsernameFree, createUser, db_login
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -128,6 +128,11 @@ class Message:
         print(obj)
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
+        if request == "login":
+            print("request is login")
+            ##!!
+            self._process_login(json_header["username"], json_header["password"]) 
+            return 
         content_len = json_header['content-length']
         self._recv_data_from_client(content_len)
         content_obj = self._recvd_msg
@@ -141,11 +146,6 @@ class Message:
         if(request == "signuppass"):
             print("request is signuppass")
             self._process_signup_pass(content)
-        if(request == "login"):
-            ##!!
-            print("request is login")
-            ##!!
-            self._process_login(content)
         if(request == "get-key"):
             self._send_rcvr_key(content["rcvr-uid"])
         if(request == "send-msg"):
@@ -217,57 +217,32 @@ class Message:
             self._send_data_to_client(encrypted=False)
             return clientPublicKey
  
-    def _process_login(self, uid):
+    def _process_login(self, username, password):
         ## Pending Imlementation
         #Required: check_login_uid returns token if uid is valid, else returns 0
-        uid_success = DatabaseRequestHandler.check_login_uid(uid)
         ##
-        if( uid_success != 0 ):
-            self._data_to_send = self._successfully_found_login_uid(uid_success)
+            
+        pwd_success = db_login(username, password) # Returns 1 if username and password match, else 0
+        ##
+        if(pwd_success == 1):
+            self.status = "logged_in"
+            ## online is 1 when user is logged in
+            self.online = 1
+            self._data_to_send = self._login_successful()
             self._send_data_to_client()
-            packed_proto_header = self.socket.recv(2)
-            json_header_length = struct.unpack('>H', packed_proto_header)[0]
-            obj = self.socket.recv(json_header_length)
-            json_header = json.loads(obj.decode(ENCODING_USED))
-            request = json_header["request"]
-            content_len = json_header['content-length']
-            content_obj = self.socket.recv(content_len)
-            content = json.loads(content_obj.decode(ENCODING_USED))
-            pwd = content
-            ## Pending Implementation
-            #Required: check_login_pwd returns 1 if matched successfully, else returns 0
-            pwd_success = DatabaseRequestHandler.check_login_pwd(uid, pwd)
-            ##
-            if(pwd_success == 1):
-                self.status = "logged_in"
-                ## online is 1 when user is logged in
-                self.online = 1
-                self._data_to_send = self._login_successful()
-                self._send_data_to_client()
-            else:
-                self._data_to_send = self._login_failed()
-                self._send_data_to_client()
         else:
-            self._data_to_send = self._login_uid_not_found()
+            self._data_to_send = self._login_failed()
             self._send_data_to_client()
         
     def _login_failed(self):
+        print("Login failed")
+        breakpoint()
         return struct.pack('>H', 1)
 
     def _login_successful(self):
+        print("login success")
         return struct.pack('>H', 0)
 
-    def _login_uid_not_found(self):
-        global ENCODING_USED
-        jsonheader = {
-            "byteorder": sys.byteorder,
-            "uid_found": 0,
-            "content-length": 0
-        }
-        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
-        encoded_json_header = self.encrypt(encoded_json_header)
-        proto_header = struct.pack('>H',len(encoded_json_header))
-        return proto_header +encoded_json_header
 
     def _successfully_found_login_uid(self, token):
         global ENCODING_USED
@@ -298,7 +273,7 @@ class Message:
         ##
         if not uid_free:
             print("Not free")
-            self._data_to_send = self._signup_uid_not_avaible()
+            self._data_to_send = self._signup_uid_not_available()
             self._send_data_to_client()
         else:
             print("Free")
