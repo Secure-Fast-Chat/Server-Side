@@ -45,14 +45,13 @@ def service(key, mask):
     sock = key.fileobj
     message =  Message.Message.fromSelKey(key)
     message.processTask(loggedClients)
-    uid, sock = message.isOnline()
-    if(message.isOnline()):
-        uid, sock = message.get_uid_sock()
-        loggedClients[uid] = sock
-    else:
-        uid, sock = message.get_uid_sock()
-        if(uid!=""):
-            del loggedClients[uid]
+    # if(message.isOnline()):
+    #     uid, sock = message.get_uid_sock()
+    #     loggedClients[uid] = sock
+    # else:
+    #     uid, sock = message.get_uid_sock()
+    #     if(uid!=""):
+    #         del loggedClients[uid]
 
 
 
@@ -60,9 +59,11 @@ def service(key, mask):
 if __name__ == "__main__":
     sel = selectors.DefaultSelector()
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     lsock.bind((HOST,PORT))
     lsock.listen()
     lsock.setblocking(False)
+    
     sel.register(lsock, selectors.EVENT_READ, data = None)
     try:
         while True:
