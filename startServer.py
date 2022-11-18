@@ -16,10 +16,10 @@ loggedClients = []
 
 
 
-def accept(sel, sock = None):
+def accept(sel, sock):
     """Function to accept a new client connection
     """
-    print(sock)
+    print(f"{sock=}")
     conn, addr = sock.accept()
     conn.setblocking(False)
     privatekey = PrivateKey.generate()

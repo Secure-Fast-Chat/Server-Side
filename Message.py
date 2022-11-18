@@ -46,7 +46,7 @@ class Message:
     @classmethod 
     def fromSelKey(cls, selectorKey):
         status = 0
-        socket = selectorKey.fileObj
+        socket = selectorKey.fileobj
         request_content=""
         _data_to_send=b''
         sel=selectorKey
