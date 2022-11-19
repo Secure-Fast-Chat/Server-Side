@@ -110,3 +110,22 @@ def storeMessageInDb(sender: str, receiver: str, message: str):
     conn.close()
     return
 
+def getE2EPublicKey(user:str)->str:
+    """Takes the username and outputs the e2e public key of that user
+
+    :param user: username of the user
+    :type user: str
+    :return: the e2ekey in base64
+    :rtype: str
+    """
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT E2EPUBLICKEY FROM {users_table_name} WHERE NAME = '{user}'
+    ''')
+    names = cur.fetchall()
+    conn.close()
+    if len(names) == 0:
+        return None
+    else:
+        return names[0][0]

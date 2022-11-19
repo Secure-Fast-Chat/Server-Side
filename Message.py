@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey
 import startServer
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -175,11 +175,12 @@ class Message:
             # We'll need to do find out the receiver's keys and box and send the message to them
             receiverSelKey = startServer.loggedClients[rcvr_uid]
             box = receiverSelKey.data["box"]
-            
+            content = box.encrypt(content)
             jsonheader = {
                 "byteorder": sys.byteorder,
                 "content-len": len(content),
                 "sender": self.username,
+                "sender_e2e_public_key": getE2EPublicKey(self.username),
                 "content-type": msg_type
             }
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
@@ -191,19 +192,19 @@ class Message:
             storeMessageInDb(self.username, rcvr_uid, content)
         
 
-    def _send_rcvr_key(self, rcvr_uid):
-
-        ##Pending Implementation
-        # check_valid_uid returns 1 if the uid is valid else returns 0
-        publickey = -1
-        if(DatabaseRequestHandler.check_valid_uid(rcvr_uid)):
-            publickey = DatabaseRequestHandler.get_pub_key(rcvr_uid)
-        ##
+    def _send_rcvr_key(self, rcvr_uid:str)->None:
+        publickey = getE2EPublicKey(rcvr_uid)
+        if publickey is None:
+            # User does not exist
+            # TODO
+            return 0
+        
         jsonheader = {
             "byteorder": sys.byteorder,
             "key": publickey
         }
         encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
         proto_header = struct.pack('>H', len(encoded_json_header))
         self._data_to_send = proto_header + encoded_json_header
         self._send_data_to_client()
@@ -253,6 +254,7 @@ class Message:
             self._data_to_send = self._login_successful()
             self.sel.data["username"] = username
             self._send_data_to_client()
+            # TODO: Send unread messages to user
         else:
             self._data_to_send = self._login_failed()
             self._send_data_to_client()
