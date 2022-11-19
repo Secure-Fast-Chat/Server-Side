@@ -92,7 +92,7 @@ class Message:
             self._recvd_msg += data
         if encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
-        return
+        return 1
 
     def _send_msg_to_reciever(self, rcvr_sock):
         """Function to send message to a reciever
@@ -131,6 +131,7 @@ class Message:
         :rtype: int
         """
         if self._recv_data_from_client(2, False) != 1:
+            print("Connection closed")
             return -1 # Connection closed
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
@@ -143,10 +144,12 @@ class Message:
             print("request is login")
             ##!!
             self._process_login(json_header["username"], json_header["password"]) 
-            return 
+            return 1
         content_len = json_header['content-length']
         self._recv_data_from_client(content_len)
         content_obj = self._recvd_msg
+        
+        
         ###################################################################
         ###################### ByteOrder Things ###########################
         ###################################################################
@@ -156,13 +159,16 @@ class Message:
             self._process_signup_uid(content)
         if(request == "signuppass"):
             print("request is signuppass")
-            self._process_signup_pass(content)
+            content = json.loads(content)
+            self._process_signup_pass(content["password"], content["e2eKey"])
+            return 1
         if(request == "get-key"):
             self._send_rcvr_key(content["rcvr-uid"]) # Get the public key of a given user
         if(request == "send-msg"):
             rcvr_uid = json_header["rcvr-uid"]
             msg_type = json_header["contexfnt-type"]
             self._send_msg(rcvr_uid, msg_type, content)
+        return 1
 
     def _send_msg(self, rcvr_uid, msg_type, content):
         if(rcvr_uid in startServer.loggedClients.keys()):
@@ -325,14 +331,13 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _process_signup_pass(self, password:str):
+    def _process_signup_pass(self, password:str, e2eKey: str):
         """Process the command for signing up the user and storing the password
 
         :param password: The password
         :type password: str
         """
-        box = self.sel.data["box"]
-        success = createUser(self.username, password)
+        success = createUser(self.username, password, e2eKey)
         if success:
             self._data_to_send = self._successfully_signed_up()
             self._send_data_to_client()

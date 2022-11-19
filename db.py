@@ -2,6 +2,7 @@ import Message
 import psycopg2
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError 
+import nacl
 dbName = "mydb"
 
 users_table_name = "Users"
@@ -32,7 +33,7 @@ def checkIfUsernameFree(username: str) -> bool:
     else:
         return False
 
-def createUser(username:str, password:str)->bool:
+def createUser(username:str, password:str, e2ePublicKey:str)->bool:
     """Adds a user with the given username and password to the database. Assumes that the checkIfUsernameFree has already been called before. We hash the password here. Returns true if the user generation happened without any error
 
     :param username: username
@@ -48,7 +49,7 @@ def createUser(username:str, password:str)->bool:
         cur = conn.cursor()
         ph = PasswordHasher()
         hashedPassword = ph.hash(password) # Salts and hashes
-        cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD) VALUES (\'{username}\', \'{hashedPassword}\')")
+        cur.execute(f"INSERT INTO {users_table_name} (NAME, PASSWORD, E2EPUBLICKEY) VALUES (\'{username}\', \'{hashedPassword}\', \'{e2ePublicKey}\')")
 
         conn.commit()
         conn.close()
