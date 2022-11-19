@@ -4,8 +4,8 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login
-
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb
+import startServer
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
@@ -69,17 +69,27 @@ class Message:
 
     def encrypt(self, data):
         return self.sel.data["box"].encrypt(data)
+    
 
-    def _recv_data_from_client(self,size, encrypted=True):
-        """ Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.
+    def _recv_data_from_client(self,size:int, encrypted=True)->int:
+        """Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.
 
-        :param size: Length of content to recieve from server
+        :param size: the size of data to receive
         :type size: int
+        :param encrypted: Whether the incoming data is supposed to be encrypted, defaults to True
+        :type encrypted: bool, optional
+        :return: code to see if something works. Returns -1 if the connection closed
+        :rtype: int
         """
 
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
-            self._recvd_msg += self.socket.recv(size-len(self._recvd_msg))
+            data = self.socket.recv(size-len(self._recvd_msg))
+            if not data:
+                print(f"close connection to {self.socket}")
+                return -1
+            
+            self._recvd_msg += data
         if encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
         return
@@ -87,8 +97,8 @@ class Message:
     def _send_msg_to_reciever(self, rcvr_sock):
         """Function to send message to a reciever
         """
-        left_message = self.sel.data["box"].encrypt(self._data_to_send)
-        rcvr_sock.sendall(left_message)
+        # left_message = self.sel.data["box"].encrypt(self._data_to_send)
+        rcvr_sock.sendall(self._data_to_send)
 
     def _json_encode(self, obj, encoding):
         """Function to encode dictionary to bytes object
@@ -114,13 +124,14 @@ class Message:
 
         return json.load(obj.decode(encoding), ensure_ascii=False)
 
-    def processTask(self, loggedClients=[]):
+    def processTask(self):
         """ Processes the task to do
 
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        self._recv_data_from_client(2, False) 
+        if self._recv_data_from_client(2, False) != 1:
+            return -1 # Connection closed
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
@@ -147,27 +158,32 @@ class Message:
             print("request is signuppass")
             self._process_signup_pass(content)
         if(request == "get-key"):
-            self._send_rcvr_key(content["rcvr-uid"])
+            self._send_rcvr_key(content["rcvr-uid"]) # Get the public key of a given user
         if(request == "send-msg"):
             rcvr_uid = json_header["rcvr-uid"]
-            msg_type = json_header["content-type"]
-            self._send_msg(rcvr_uid, msg_type, content, loggedClients)
+            msg_type = json_header["contexfnt-type"]
+            self._send_msg(rcvr_uid, msg_type, content)
 
-    def _send_msg(self, rcvr_uid, msg_type, content, loggedClients):
-        jsonheader = {
-            "byteorder": sys.byteorder,
-            "content-len": len(content),
-            "sender": self.username,
-            "content-type": msg_type
-        }
-        encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
-        proto_header = struct.pack('>H', len(encoded_json_header))
-        self._data_to_send = proto_header + encoded_json_header + content
-        if(rcvr_uid in loggedClients.keys()):
-            self._send_msg_to_reciever(loggedClients[rcvr_uid])
+    def _send_msg(self, rcvr_uid, msg_type, content):
+        if(rcvr_uid in startServer.loggedClients.keys()):
+            # We'll need to do find out the receiver's keys and box and send the message to them
+            receiverSelKey = startServer.loggedClients[rcvr_uid]
+            box = receiverSelKey.data["box"]
+            
+            jsonheader = {
+                "byteorder": sys.byteorder,
+                "content-len": len(content),
+                "sender": self.username,
+                "content-type": msg_type
+            }
+            encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+            encoded_json_header = box.encrypt(encoded_json_header)
+            proto_header = struct.pack('>H', len(encoded_json_header))
+            self._data_to_send = proto_header + encoded_json_header + content
+            self._send_msg_to_reciever(receiverSelKey.fileobj)
         else:
-            ##Pending Implementation
-            DatabaseRequestHandler.storemsg(rcvr_uid, self._data_to_send)
+            storeMessageInDb(self.username, rcvr_uid, content)
+        
 
     def _send_rcvr_key(self, rcvr_uid):
 
@@ -330,5 +346,5 @@ class Message:
         else:
             return 0
 
-    def get_uid_sock(self):
-        return (self.username, self.socket)
+    def get_uid_selKey(self):
+        return (self.username, self.sel)

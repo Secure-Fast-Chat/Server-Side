@@ -12,7 +12,7 @@ HOST = "127.0.0.1"
 PORT = 8000
 ENCODING_USED = "utf-8"
 
-loggedClients = []
+
 
 
 
@@ -44,20 +44,28 @@ def service(key, mask):
     ##!!
     sock = key.fileobj
     message =  Message.Message.fromSelKey(key)
-    message.processTask(loggedClients)
-    # if(message.isOnline()):
-    #     uid, sock = message.get_uid_sock()
-    #     loggedClients[uid] = sock
-    # else:
-    #     uid, sock = message.get_uid_sock()
-    #     if(uid!=""):
-    #         del loggedClients[uid]
+    global loggedClients
+    global sel
+    if message.processTask() != -1:
+        uid, selKey = message.get_uid_selKey()
+
+        loggedClients[uid] = selKey
+    else:
+        uid, selKey = message.get_uid_selKey()
+        sock = selKey.fileobj
+        sel.unregister(sock)
+        sock.close()
+        if(uid!=""):
+            del loggedClients[uid]
 
 
 
 
 if __name__ == "__main__":
+    global sel
     sel = selectors.DefaultSelector()
+    global loggedClients
+    loggedClients = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     lsock.bind((HOST,PORT))
