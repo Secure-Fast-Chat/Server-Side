@@ -88,7 +88,6 @@ class Message:
             if not data:
                 print(f"close connection to {self.socket}")
                 return -1
-            
             self._recvd_msg += data
         if encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
@@ -146,7 +145,8 @@ class Message:
             self._process_login(json_header["username"], json_header["password"]) 
             return 1
         content_len = json_header['content-length']
-        self._recv_data_from_client(content_len)
+        if content_len:
+            self._recv_data_from_client(content_len)
         content_obj = self._recvd_msg
         
         
@@ -163,7 +163,8 @@ class Message:
             self._process_signup_pass(content["password"], content["e2eKey"])
             return 1
         if(request == "get-key"):
-            self._send_rcvr_key(content["rcvr-uid"]) # Get the public key of a given user
+            print(content)
+            self._send_rcvr_key(json_header["recvr-username"]) # Get the public key of a given user
         if(request == "send-msg"):
             rcvr_uid = json_header["rcvr-uid"]
             msg_type = json_header["contexfnt-type"]
@@ -190,7 +191,6 @@ class Message:
             self._send_msg_to_reciever(receiverSelKey.fileobj)
         else:
             storeMessageInDb(self.username, rcvr_uid, content)
-        
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         publickey = getE2EPublicKey(rcvr_uid)
@@ -244,7 +244,6 @@ class Message:
         ## Pending Imlementation
         #Required: check_login_uid returns token if uid is valid, else returns 0
         ##
-            
         pwd_success = db_login(username, password) # Returns 1 if username and password match, else 0
         ##
         if(pwd_success == 1):
@@ -266,7 +265,6 @@ class Message:
     def _login_successful(self):
         print("login success")
         return struct.pack('>H', 0)
-
 
     def _successfully_found_login_uid(self, token):
         global ENCODING_USED

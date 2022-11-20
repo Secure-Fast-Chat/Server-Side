@@ -12,10 +12,6 @@ HOST = "127.0.0.1"
 PORT = 8000
 ENCODING_USED = "utf-8"
 
-
-
-
-
 def accept(sel, sock):
     """Function to accept a new client connection
     """
@@ -58,9 +54,6 @@ def service(key, mask):
         if(uid!=""):
             del loggedClients[uid]
 
-
-
-
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
@@ -77,8 +70,8 @@ if __name__ == "__main__":
         while True:
             print("Reached//")
             events = sel.select(timeout = None)
-            print(events)
             for key, mask in events:
+                print('going good ')
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
