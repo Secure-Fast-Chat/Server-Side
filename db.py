@@ -12,7 +12,7 @@ messages_table_name = "Messages"
 dbUser = "fasty"
 dbPass = "pass123"
 dbHost = "localhost"
-dbPort = "5432"
+dbPort = 5432
 def checkIfUsernameFree(username: str) -> bool:
     """Check if a given username is already in use
 

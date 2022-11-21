@@ -89,8 +89,10 @@ class Message:
                 print(f"close connection to {self.socket}")
                 return -1
             self._recvd_msg += data
+        print('hey there ',encrypted,self._recvd_msg)
         if encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
+        print('ho',self._recvd_msg)
         return 1
 
     def _send_msg_to_reciever(self, rcvr_sock):
@@ -153,7 +155,10 @@ class Message:
         ###################################################################
         ###################### ByteOrder Things ###########################
         ###################################################################
-        content = content_obj.decode(ENCODING_USED)
+        if(request == "send-msg"):
+            content = content_obj
+        else:
+            content = content_obj.decode(ENCODING_USED)
         if(request == "signupuid"):
             print("request is signupuid")
             self._process_signup_uid(content)
@@ -167,7 +172,7 @@ class Message:
             self._send_rcvr_key(json_header["recvr-username"]) # Get the public key of a given user
         if(request == "send-msg"):
             rcvr_uid = json_header["rcvr-uid"]
-            msg_type = json_header["contexfnt-type"]
+            msg_type = json_header["content-type"]
             self._send_msg(rcvr_uid, msg_type, content)
         return 1
 
