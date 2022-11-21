@@ -90,10 +90,10 @@ def db_login(username: str, password: str)->bool:
 
 
 
-def storeMessageInDb(sender: str, receiver: str, message: str):
+def storeMessageInDb(sender: str, receiver: str, message: str, timestamp:str, content_type: str):
     """stores the encrypted message in the database, in case it is not possible to send them the message directly
 
-    :param sender: sender username (TODO: Do we keep these encrypted?)
+    :param sender: sender username
     :type sender: str
     :param receiver: receiver username
     :type receiver: str
@@ -103,8 +103,8 @@ def storeMessageInDb(sender: str, receiver: str, message: str):
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
 
-    cur.execute(f"INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
-      VALUES (\'{sender}\', \'{receiver}\', \'{message}\')")
+    cur.execute(f'''INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE) \
+      VALUES (\'{sender}\', \'{receiver}\', \'{message.decode('utf-8')}\', \'{timestamp}\', \'{content_type}\')''')
 
     conn.commit()
     conn.close()
