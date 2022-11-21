@@ -144,7 +144,6 @@ class Message:
         request = json_header["request"]
         if request == "login":
             print("request is login")
-            ##!!
             self._process_login(json_header["username"], json_header["password"]) 
             return 1
         content_len = json_header['content-length']
@@ -242,11 +241,12 @@ class Message:
             else:
                 return 1
 
-    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None):
-        if not grp_uid:
-            sender = self.username
-        else:
-            sender = grp_uid + "::" + self.username
+    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
+        if(sender is None):
+            if not grp_uid:
+                sender = self.username
+            else:
+                sender = grp_uid + "::" + self.username
         timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         sent = False
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
@@ -271,9 +271,11 @@ class Message:
             self._data_to_send = proto_header + encoded_json_header + content
             self._send_msg_to_reciever(receiverSelKey.fileobj)
             sent = True
+            ##!!
             # response = struct.unpack('>H',self._recv_data_from_client(2))[0]
             # if response == 0:
             #     sent = True
+            ##!!
         if not sent:
             storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
 
@@ -339,7 +341,17 @@ class Message:
             self.sel.data["username"] = username
             self.username = username
             self._send_data_to_client()
+            # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
+            unsent_messages = DatabaseRequestHandler.getUnsentMessages(self.username)
+            count = 0
+            for msg in unsent_messages:
+                (sender, rcvr, messg, timestamp, msgtype) = msg
+                guid = None
+                if("::" in sender):
+                    guid = sender[0:sender.find("::")]
+                self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender)
             # TODO: Send unread messages to user
+
         else:
             self._data_to_send = self._login_failed()
             self._send_data_to_client()

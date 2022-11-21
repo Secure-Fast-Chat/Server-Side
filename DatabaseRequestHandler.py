@@ -9,3 +9,6 @@ def check_login_uid(uid):
 
 def check_login_pwd(uid, pwd):
     return 1
+
+def getUnsentMessages(uid):
+    return []
