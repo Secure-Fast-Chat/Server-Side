@@ -5,7 +5,7 @@ import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
 from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey
-import startServer
+import datetime
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
@@ -198,6 +198,7 @@ class Message:
 
 
     def _send_msg(self, rcvr_uid, msg_type, content):
+        timestamp = str(datetime.datetime.now())
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
             receiverSelKey = LOGGED_CLIENTS[rcvr_uid]
@@ -208,7 +209,8 @@ class Message:
                 "content-length": len(content),
                 "sender": self.username,
                 "sender_e2e_public_key": getE2EPublicKey(self.username),
-                "content-type": msg_type
+                "content-type": msg_type,
+                "timestamp": timestamp,
             }
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
             encoded_json_header = box.encrypt(encoded_json_header)
@@ -217,7 +219,7 @@ class Message:
             self._send_msg_to_reciever(receiverSelKey.fileobj)
             print("DONENONODNE")
         else:
-            storeMessageInDb(self.username, rcvr_uid, content)
+            storeMessageInDb(self.username, rcvr_uid, content, timestamp, msg_type)
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         publickey = getE2EPublicKey(rcvr_uid)
