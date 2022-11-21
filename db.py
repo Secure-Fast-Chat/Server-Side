@@ -126,12 +126,12 @@ def getE2EPublicKey(user:str)->str:
     cur.execute(f'''
         SELECT E2EPUBLICKEY FROM {users_table_name} WHERE NAME = '{user}'
     ''')
-    names = cur.fetchall()
+    keys = cur.fetchall()
     conn.close()
-    if len(names) == 0:
+    if len(keys) == 0:
         return None
     else:
-        return names[0][0]
+        return keys[0][0]
 
 def getUnsentMessages(username: str)->list:
     """Get the unsent messages to a particular user, ordered by timestamp
@@ -173,7 +173,7 @@ def checkIfGroupNameFree(groupName: str)-> bool:
         return False
  
 
-def createGroup(groupname:str, key:str, creatorUsername:str)->bool:
+def createGroup(groupname:str, key:str, creatorUsername:str, creatorE2Ekey: str)->bool:
     """Creates a new group in the database
 
     :param groupname: name of the group
@@ -189,7 +189,7 @@ def createGroup(groupname:str, key:str, creatorUsername:str)->bool:
         conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
 
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, CREATOR) VALUES (\'{groupname}\', \'{creatorUsername}\')")
+        cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, CREATOR, CREATORKEY) VALUES (\'{groupname}\', \'{creatorUsername}\', '{creatorE2Ekey}')")
         cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USER) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
 
         conn.commit()
@@ -235,3 +235,32 @@ def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
         return False
 
     return True
+
+def getGroupMembers(groupname: str)->list(str):
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT * FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}'
+    ''')
+    names = cur.fetchall()
+    names = list(list(zip(*names))[0])
+    return names
+ 
+
+def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT KEY FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}' and USER ='{username}'
+    ''')
+    
+    keys = cur.fetchall()
+    if len(keys) == 0:
+        return "", "" # User not in group
+    encryptedGroupUserKey = keys[0][0]
+    cur.execute(f'''
+        SELECT CREATORKEY FROM {groups_table_name} WHERE GROUPNAME = '{groupname}'
+    ''')
+    keys = cur.fetchall()
+    creatorE2EKey = keys[0][0]
+    return encryptedGroupUserKey, creatorE2EKey

@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey
 import datetime
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -194,14 +194,14 @@ class Message:
         :param msg_type: Type of message to be send, text or file object
         :type msg_type: str
         :param content: message to be sent
-        "type content: str"""
-        ##Pending Implementation
+        :type content: str
+        """
         #check_grp_uid returns 1 if grp_uid already exists else return 0
-        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
+        grp_uid_exists = not checkIfGroupNameFree(grp_uid)
         if(not grp_uid_exists):
-            return 2
+            return 2 # Group does not exist
         else:
-            grp_members = DatabaseRequestHandler.get_grp_users(grp_uid)
+            grp_members = getGroupMembers(grp_uid)
             if(self.username not in grp_members):
                 return 2
             for member in grp_members:
@@ -224,9 +224,7 @@ class Message:
             # Group does not exist
             return 1
         else:
-            #Pending Implementation
-            #check_valid_admin returns 1 if the admin is valid else returns 0
-            valid_admin = isGroupAdmin(grp_uid, self.username)
+            valid_admin = isGroupAdmin(grp_uid, self.username) # True if admin
             if not valid_admin:
                 return 2
             elif not user_exists:
@@ -251,7 +249,8 @@ class Message:
         if not grpNameFree:
             return 1
         else:
-            grp_created = createGroup(grp_uid, grp_key, self.username) #True if group created successfully
+            grp_created = createGroup(grp_uid, grp_key, self.username, getE2EPublicKey(self.username)) #True if group created successfully
+
             if grp_created:
                 return 0
             else:
@@ -289,10 +288,12 @@ class Message:
                 "sender_e2e_public_key": getE2EPublicKey(self.username),
                 "content-type": msg_type,
                 "timestamp": timestamp,
+                'sender-type': 'user',
             }
             if grp_uid:
                 jsonheader['sender-type'] = 'group'
-                jsonheader['group-key'] = DatabaseRequestHandler.get_user_encrypted_group_private_key(grp_uid)
+                jsonheader['group-key'], jsonheader['creatorPubkey'] = getUsersGroupKey(grp_uid)
+                
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
             encoded_json_header = box.encrypt(encoded_json_header)
             proto_header = struct.pack('>H', len(encoded_json_header))
