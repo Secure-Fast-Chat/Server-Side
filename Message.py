@@ -9,6 +9,7 @@ import startServer
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
+LOGGED_CLIENTS = None
 
 class Message:
     """This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class
@@ -198,14 +199,14 @@ class Message:
 
 
     def _send_msg(self, rcvr_uid, msg_type, content):
-        if(rcvr_uid in startServer.loggedClients.keys()):
+        if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
-            receiverSelKey = startServer.loggedClients[rcvr_uid]
+            receiverSelKey = LOGGED_CLIENTS[rcvr_uid]
             box = receiverSelKey.data["box"]
             content = box.encrypt(content)
             jsonheader = {
                 "byteorder": sys.byteorder,
-                "content-len": len(content),
+                "content-length": len(content),
                 "sender": self.username,
                 "sender_e2e_public_key": getE2EPublicKey(self.username),
                 "content-type": msg_type
@@ -215,6 +216,7 @@ class Message:
             proto_header = struct.pack('>H', len(encoded_json_header))
             self._data_to_send = proto_header + encoded_json_header + content
             self._send_msg_to_reciever(receiverSelKey.fileobj)
+            print("DONENONODNE")
         else:
             storeMessageInDb(self.username, rcvr_uid, content)
 

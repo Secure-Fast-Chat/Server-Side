@@ -40,25 +40,23 @@ def service(key, mask):
     ##!!
     sock = key.fileobj
     message =  Message.Message.fromSelKey(key)
-    global loggedClients
     global sel
     if message.processTask() != -1:
         uid, selKey = message.get_uid_selKey()
 
-        loggedClients[uid] = selKey
+        Message.LOGGED_CLIENTS[uid] = selKey
     else:
         uid, selKey = message.get_uid_selKey()
         sock = selKey.fileobj
         sel.unregister(sock)
         sock.close()
         if(uid!=""):
-            del loggedClients[uid]
+            del Message.LOGGED_CLIENTS[uid]
 
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
-    global loggedClients
-    loggedClients = {}
+    Message.LOGGED_CLIENTS = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     lsock.bind((HOST,PORT))
