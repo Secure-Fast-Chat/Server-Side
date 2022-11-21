@@ -174,7 +174,28 @@ class Message:
             rcvr_uid = json_header["rcvr-uid"]
             msg_type = json_header["content-type"]
             self._send_msg(rcvr_uid, msg_type, content)
+        if(request == "create-grp"):
+            grp_uid = json_header["guid"]
+            grp_key = json_header["group-key"]
+            return self._create_grp(grp_uid, grp_key)
         return 1
+
+
+    def _create_grp(grp_uid, grp_key):
+        ##Pending Implementation
+        #check_grp_uid returns 1 if grp_uid already exists
+        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
+        if(grp_uid_exists):
+            return 1
+        else:
+            ##Pending Implementation
+            #create_new_grp returns 1 if grp successfully created
+            grp_created = DatabaseRequestHandler.create_new_grp(grp_uid, grp_key)
+            if(grp_created):
+                return 0
+            else:
+                return 1
+
 
     def _send_msg(self, rcvr_uid, msg_type, content):
         if(rcvr_uid in startServer.loggedClients.keys()):
