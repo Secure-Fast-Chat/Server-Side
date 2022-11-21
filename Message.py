@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup
 import datetime
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -236,22 +236,19 @@ class Message:
                 DatabaseRequestHandler.add_new_user_in_grp(grp_uid, new_uid, user_grp_key)
                 return 0
 
-    def _create_grp(self, grp_uid, grp_key):
+    def _create_grp(self, grp_uid:str, grp_key:str):
         """Processes new group creation
         :param grp_uid: user Id of the new group to be created
         :type grp_uid: str
         :param grp_key: public key for the group
         :type grp_key: str"""
-        ##Pending Implementation
-        #check_grp_uid returns 1 if grp_uid already exists
-        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
-        if(grp_uid_exists):
+        grp_uid_exists = checkIfGroupNameFree(grp_uid)
+        if grp_uid_exists:
             return 1
         else:
-            ##Pending Implementation
             #create_new_grp returns 1 if grp successfully created
-            grp_created = DatabaseRequestHandler.create_new_grp(grp_uid, grp_key, self.username)
-            if(grp_created):
+            grp_created = createGroup(grp_uid, grp_key, self.username)
+            if grp_created:
                 return 0
             else:
                 return 1

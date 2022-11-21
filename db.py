@@ -7,6 +7,8 @@ dbName = "mydb"
 
 users_table_name = "Users"
 messages_table_name = "Messages"
+groups_table_name = "Users"
+
 
 # Assuming the db passwords etc are the same.
 dbUser = "fasty"
@@ -147,3 +149,40 @@ def getUnsentMessages(username: str)->list:
     conn.commit()
     conn.close()
     return messages
+
+
+def checkIfGroupNameFree(groupName: str)-> bool:
+    """Check if a given groupname is already in use
+
+    :param groupName: The groupname to check
+    :type username: str
+    :return: Whether the name is in use or not
+    :rtype: bool
+    """
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT * FROM {groups_table_name} WHERE NAME = '{groupName}'
+    ''')
+    names = cur.fetchall()
+    conn.close()
+    if len(names) == 0:
+        return True
+    else:
+        return False
+ 
+
+def createGroup(groupname:str, key:str, creatorUsername:str)->bool:
+    try:
+        conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, KEY, CREATOR) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
+
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+        return False
+
+    return True
