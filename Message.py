@@ -84,6 +84,7 @@ class Message:
 
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
+            print("hi,can you find bug")
             data = self.socket.recv(size-len(self._recvd_msg))
             if not data:
                 print(f"close connection to {self.socket}")
@@ -269,9 +270,10 @@ class Message:
             proto_header = struct.pack('>H', len(encoded_json_header))
             self._data_to_send = proto_header + encoded_json_header + content
             self._send_msg_to_reciever(receiverSelKey.fileobj)
-            response = struct.unpack('>H',self._recv_data_from_client(2))[0]
-            if response == 0:
-                sent = True
+            sent = True
+            # response = struct.unpack('>H',self._recv_data_from_client(2))[0]
+            # if response == 0:
+            #     sent = True
         if not sent:
             storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
 
