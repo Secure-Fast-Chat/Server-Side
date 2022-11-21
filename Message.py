@@ -41,12 +41,13 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
+        self.username = ""
         try:
             # breakpoint()
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
         except:
             self.username = ""
-        self.online = 0
+        self.online = self.username != "" and self.username in LOGGED_CLIENTS.keys()
 
     @classmethod 
     def fromSelKey(cls, selectorKey):
@@ -165,6 +166,8 @@ class Message:
             print("request is signuppass")
             content = json.loads(content)
             self._process_signup_pass(content["password"], content["e2eKey"])
+            return 1
+        if not self.online:
             return 1
         if(request == "get-key"):
             print(content)
