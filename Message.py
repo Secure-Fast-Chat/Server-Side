@@ -14,8 +14,6 @@ LOGGED_CLIENTS = None
 class Message:
     """This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class
 
-    :param task: Task to be done. It can have the values signup, login, send_message
-    :type task: str
     :param socket: The socket used for connection with Server
     :type socket: socket.socket
     :param request_content: Content to include in the request to send to server
@@ -31,8 +29,6 @@ class Message:
 
         :param conn_socket: Socket which has a connection with client
         :type conn_socket: socket.socket
-        :param task: Task to do. It can have values: login, signup, send_message
-        :type task: str
         :param request: Content to send to server
         :type request: str
         """
@@ -192,6 +188,13 @@ class Message:
         return 1
 
     def _send_grp_message(self, grp_uid, msg_type, content):
+        """Send messages in a group
+        :param grp_uid: Id of the group in which message is to be sent
+        :type grp_uid: str
+        :param msg_type: Type of message to be send, text or file object
+        :type msg_type: str
+        :param content: message to be sent
+        "type content: str"""
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists else return 0
         grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
@@ -205,6 +208,13 @@ class Message:
                 self._send_msg(member, msg_type, content, grp_uid = grp_uid)
             
     def _add_grp_mem(self, grp_uid, new_uid, user_grp_key):
+        """Function to add a new member in the group
+        :param grp_uid: id of the group in which member is to be added
+        :type grp_uid: str
+        :param new_uid: user id of the new user which is to be added in the group
+        :type new_uid: str
+        :param user_grp_key: Public key of the group
+        "type user_grp_key: str"""
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists else return 0
         #check_uid_exists returns 1 if new_uid is valid else return 0
@@ -227,6 +237,11 @@ class Message:
                 return 0
 
     def _create_grp(self, grp_uid, grp_key):
+        """Processes new group creation
+        :param grp_uid: user Id of the new group to be created
+        :type grp_uid: str
+        :param grp_key: public key for the group
+        :type grp_key: str"""
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists
         grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
@@ -242,6 +257,18 @@ class Message:
                 return 1
 
     def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
+        """Sends messages to the specified user
+        :param rcvr_uid: User ID of the reciever client
+        :type rcvr_uid: str
+        :param msg_type: Type of message, text or file 
+        :type msg_type: str
+        :param content: Encrypted message to be sent
+        :type content: str
+        :param grp_uid: GroupId in case of group message
+        :type grp_uid: str
+        :param sender: name of the message sender, in case of group chat, it is grp_id::user_id
+        :type sender: str
+        """
         if(sender is None):
             if not grp_uid:
                 sender = self.username
@@ -280,6 +307,10 @@ class Message:
             storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
+        """Gets the public key of a given user
+        :param rcvr_uid: User id of the user whose public key is requested
+        :type rcvr_uid: str
+        """
         publickey = getE2EPublicKey(rcvr_uid)
         if publickey is None:
             # User does not exist
@@ -328,6 +359,13 @@ class Message:
             return clientPublicKey
  
     def _process_login(self, username, password):
+        """Processes Login Request
+        On successful login sends pending messages
+        :param username: Username of the Client to be logged in 
+        :type username: str
+        :param password: Password of the Client to be logged in
+        :type password: str 
+        """
         ## Pending Imlementation
         #Required: check_login_uid returns token if uid is valid, else returns 0
         ##
@@ -386,6 +424,10 @@ class Message:
         return struct.pack('>H',1)
 
     def _process_signup_uid(self,uid):
+        """Processes Signup Request by validating if requested Uid already exists or not
+        :param uid: User ID of new user
+        :type uid: str
+        """
         ## Pending Implementation
         #Required: checkuid returns key, if uid is available to be used, else returns 0
         uid_free = checkIfUsernameFree(uid)
