@@ -190,7 +190,7 @@ def createGroup(groupname:str, key:str, creatorUsername:str, creatorE2Ekey: str)
 
         cur = conn.cursor()
         cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, CREATOR, CREATORKEY) VALUES (\'{groupname}\', \'{creatorUsername}\', '{creatorE2Ekey}')")
-        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USER) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
+        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USERNAME) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
 
         conn.commit()
         conn.close()
@@ -227,7 +227,7 @@ def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
     try:
         conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USER) VALUES (\'{groupname}\', \'{usersGroupKey}\', \'{username}\')")
+        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USERNAME) VALUES (\'{groupname}\', \'{usersGroupKey}\', \'{username}\')")
         conn.commit()
         conn.close()
     except Exception as e:
@@ -236,7 +236,7 @@ def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
 
     return True
 
-def getGroupMembers(groupname: str)->list(str):
+def getGroupMembers(groupname: str)->list[str]:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
@@ -251,7 +251,7 @@ def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        SELECT KEY FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}' and USER ='{username}'
+        SELECT KEY FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}' and USERNAME ='{username}'
     ''')
     
     keys = cur.fetchall()
