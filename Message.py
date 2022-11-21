@@ -42,6 +42,7 @@ class Message:
         self._data_to_send = b''
         self.sel = sel
         try:
+            # breakpoint()
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
         except:
             self.username = ""
@@ -49,13 +50,11 @@ class Message:
 
     @classmethod 
     def fromSelKey(cls, selectorKey):
-        status = 0
         socket = selectorKey.fileobj
         request_content=""
-        _data_to_send=b''
         sel=selectorKey
+        status = 0
         
-        online=0
         return cls(socket, 0, request_content, sel)
 
     def _send_data_to_client(self, encrypted=True):
@@ -280,6 +279,7 @@ class Message:
             self.online = 1
             self._data_to_send = self._login_successful()
             self.sel.data["username"] = username
+            self.username = username
             self._send_data_to_client()
             # TODO: Send unread messages to user
         else:
@@ -365,6 +365,10 @@ class Message:
         :param password: The password
         :type password: str
         """
+        if self.username == "":
+            self._data_to_send = self._signup_failed()
+            self._send_data_to_client()
+ 
         success = createUser(self.username, password, e2eKey)
         if success:
             self._data_to_send = self._successfully_signed_up()

@@ -39,12 +39,13 @@ def service(key, mask):
     print("Processing request")
     ##!!
     sock = key.fileobj
+    # breakpoint()
     message =  Message.Message.fromSelKey(key)
     global sel
     if message.processTask() != -1:
         uid, selKey = message.get_uid_selKey()
-
-        Message.LOGGED_CLIENTS[uid] = selKey
+        if uid != "":
+            Message.LOGGED_CLIENTS[uid] = selKey
     else:
         uid, selKey = message.get_uid_selKey()
         sock = selKey.fileobj
