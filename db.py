@@ -131,6 +131,13 @@ def getE2EPublicKey(user:str)->str:
         return names[0][0]
 
 def getUnsentMessages(username: str)->list:
+    """Get the unsent messages to a particular user, ordered by timestamp
+
+    :param username: username of receiver
+    :type username: str
+    :return: list of tuples containing the data about the messages
+    :rtype: list
+    """
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
 
