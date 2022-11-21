@@ -103,8 +103,8 @@ def storeMessageInDb(sender: str, receiver: str, message: str):
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
 
-    cur.execute(f"INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
-      VALUES (\'{sender}\', \'{receiver}\', \'{message}\')")
+    cur.execute(f'''INSERT INTO {messages_table_name} (SENDER, RECEIVER, MESSAGE) \
+      VALUES (\'{sender}\', \'{receiver}\', \'{message.decode('utf-8')}\')''')
 
     conn.commit()
     conn.close()
