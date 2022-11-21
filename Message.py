@@ -71,7 +71,6 @@ class Message:
     def encrypt(self, data):
         return self.sel.data["box"].encrypt(data)
     
-
     def _recv_data_from_client(self,size:int, encrypted=True)->int:
         """Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.
 
@@ -179,10 +178,51 @@ class Message:
             grp_uid = json_header["guid"]
             grp_key = json_header["group-key"]
             return self._create_grp(grp_uid, grp_key)
+        if(request == "add-mem"):
+            grp_uid = json_header["guid"]
+            new_uid = json_header["new-uid"]
+            user_grp_key = json_header["user-grp-key"]
+            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
+        if(request == 'send-group-message'):
+            grp_uid = json_header["guid"]
+            return self._send_grp_message(grp_uid)
         return 1
 
+    def _send_grp_message(self, grp_uid):
+        ##Pending Implementation
+        #check_grp_uid returns 1 if grp_uid already exists else return 0
+        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
+        if(not grp_uid_exists):
+            return 2
+        else:
+            grp_members = DatabaseRequestHandler.get_grp_users(grp_uid)
+            if(self.username not in grp_members):
+                return 2
+            
 
-    def _create_grp(grp_uid, grp_key):
+    def _add_grp_mem(self, grp_uid, new_uid, user_grp_key):
+        ##Pending Implementation
+        #check_grp_uid returns 1 if grp_uid already exists else return 0
+        #check_uid_exists returns 1 if new_uid is valid else return 0
+        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
+        user_exists = DatabaseRequestHandler.check_uid_exists(new_uid)
+        if(not grp_uid_exists):
+            return 1
+        else:
+            #Pending Implementation
+            #check_valid_admin returns 1 if the admin is valid else returns 0
+            valid_admin = DatabaseRequestHandler.check_valid_admin(grp_uid, self.username)
+            if(not valid_admin):
+                return 2
+            elif(not user_exists):
+                return 3
+            else:
+                #Pending Implementation
+                #add_new_user_in_grp 
+                DatabaseRequestHandler.add_new_user_in_grp(grp_uid, new_uid, user_grp_key)
+                return 0
+
+    def _create_grp(self, grp_uid, grp_key):
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists
         grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
@@ -191,12 +231,11 @@ class Message:
         else:
             ##Pending Implementation
             #create_new_grp returns 1 if grp successfully created
-            grp_created = DatabaseRequestHandler.create_new_grp(grp_uid, grp_key)
+            grp_created = DatabaseRequestHandler.create_new_grp(grp_uid, grp_key, self.username)
             if(grp_created):
                 return 0
             else:
                 return 1
-
 
     def _send_msg(self, rcvr_uid, msg_type, content):
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
