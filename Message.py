@@ -184,10 +184,11 @@ class Message:
             return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
         if(request == 'send-group-message'):
             grp_uid = json_header["guid"]
-            return self._send_grp_message(grp_uid)
+            msg_type = json_header["content-type"]
+            return self._send_grp_message(grp_uid, msg_type, content)
         return 1
 
-    def _send_grp_message(self, grp_uid):
+    def _send_grp_message(self, grp_uid, msg_type, content):
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists else return 0
         grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
@@ -197,8 +198,9 @@ class Message:
             grp_members = DatabaseRequestHandler.get_grp_users(grp_uid)
             if(self.username not in grp_members):
                 return 2
+            for member in grp_members:
+                self._send_msg(member, msg_type, content, grp_uid = grp_uid)
             
-
     def _add_grp_mem(self, grp_uid, new_uid, user_grp_key):
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists else return 0
@@ -236,8 +238,13 @@ class Message:
             else:
                 return 1
 
-    def _send_msg(self, rcvr_uid, msg_type, content):
+    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None):
+        if not grp_uid:
+            sender = self.username
+        else:
+            sender = grp_uid + "::" + self.username
         timestamp = str(datetime.datetime.now())
+        sent = False
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
             receiverSelKey = LOGGED_CLIENTS[rcvr_uid]
@@ -246,19 +253,24 @@ class Message:
             jsonheader = {
                 "byteorder": sys.byteorder,
                 "content-length": len(content),
-                "sender": self.username,
+                "sender": sender,
                 "sender_e2e_public_key": getE2EPublicKey(self.username),
                 "content-type": msg_type,
                 "timestamp": timestamp,
             }
+            if grp_uid:
+                jsonheader['sender-type'] = 'group'
+                jsonheader['group-key'] = DatabaseRequestHandler.get_user_encrypted_group_private_key(grp_uid)
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
             encoded_json_header = box.encrypt(encoded_json_header)
             proto_header = struct.pack('>H', len(encoded_json_header))
             self._data_to_send = proto_header + encoded_json_header + content
             self._send_msg_to_reciever(receiverSelKey.fileobj)
-            print("DONENONODNE")
-        else:
-            storeMessageInDb(self.username, rcvr_uid, content, timestamp, msg_type)
+            response = struct.unpack('>H',self._recv_data_from_client(2))[0]
+            if response == 0:
+                sent = True
+        if not sent:
+            storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         publickey = getE2EPublicKey(rcvr_uid)
