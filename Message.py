@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup
 import datetime
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -218,36 +218,40 @@ class Message:
         ##Pending Implementation
         #check_grp_uid returns 1 if grp_uid already exists else return 0
         #check_uid_exists returns 1 if new_uid is valid else return 0
-        grp_uid_exists = DatabaseRequestHandler.check_grp_uid(grp_uid)
-        user_exists = DatabaseRequestHandler.check_uid_exists(new_uid)
-        if(not grp_uid_exists):
+        grpNameFree = checkIfGroupNameFree(grp_uid)
+        user_exists = not checkIfUsernameFree(new_uid)
+        if grpNameFree:
+            # Group does not exist
             return 1
         else:
             #Pending Implementation
             #check_valid_admin returns 1 if the admin is valid else returns 0
-            valid_admin = DatabaseRequestHandler.check_valid_admin(grp_uid, self.username)
-            if(not valid_admin):
+            valid_admin = isGroupAdmin(grp_uid, self.username)
+            if not valid_admin:
                 return 2
-            elif(not user_exists):
+            elif not user_exists:
                 return 3
             else:
                 #Pending Implementation
                 #add_new_user_in_grp 
-                DatabaseRequestHandler.add_new_user_in_grp(grp_uid, new_uid, user_grp_key)
+                addUserToGroup(grp_uid, new_uid, user_grp_key)
                 return 0
 
     def _create_grp(self, grp_uid:str, grp_key:str):
-        """Processes new group creation
-        :param grp_uid: user Id of the new group to be created
+        """Creates a new group
+
+        :param grp_uid: name of the group
         :type grp_uid: str
-        :param grp_key: public key for the group
-        :type grp_key: str"""
-        grp_uid_exists = checkIfGroupNameFree(grp_uid)
-        if grp_uid_exists:
+        :param grp_key: the key used for encrypting messages
+        :type grp_key: str
+        :return: 1 if there was an error, 0 otherwise
+        :rtype: int
+        """
+        grpNameFree = checkIfGroupNameFree(grp_uid)
+        if not grpNameFree:
             return 1
         else:
-            #create_new_grp returns 1 if grp successfully created
-            grp_created = createGroup(grp_uid, grp_key, self.username)
+            grp_created = createGroup(grp_uid, grp_key, self.username) #True if group created successfully
             if grp_created:
                 return 0
             else:

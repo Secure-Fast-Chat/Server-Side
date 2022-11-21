@@ -7,7 +7,8 @@ dbName = "mydb"
 
 users_table_name = "Users"
 messages_table_name = "Messages"
-groups_table_name = "Users"
+groups_table_name = "Groups"
+groups_members_table_name = "GroupMembers"
 
 
 # Assuming the db passwords etc are the same.
@@ -162,7 +163,7 @@ def checkIfGroupNameFree(groupName: str)-> bool:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        SELECT * FROM {groups_table_name} WHERE NAME = '{groupName}'
+        SELECT * FROM {groups_table_name} WHERE GROUPNAME = '{groupName}'
     ''')
     names = cur.fetchall()
     conn.close()
@@ -173,12 +174,60 @@ def checkIfGroupNameFree(groupName: str)-> bool:
  
 
 def createGroup(groupname:str, key:str, creatorUsername:str)->bool:
+    """Creates a new group in the database
+
+    :param groupname: name of the group
+    :type groupname: str
+    :param key: key used for encrypting messages for this group. Note that this is encrypted by the creators e2e encrypted key
+    :type key: str
+    :param creatorUsername: username of creator
+    :type creatorUsername: str
+    :return: _description_
+    :rtype: bool
+    """
     try:
         conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
 
         cur = conn.cursor()
-        cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, KEY, CREATOR) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
+        cur.execute(f"INSERT INTO {groups_table_name} (GROUPNAME, CREATOR) VALUES (\'{groupname}\', \'{creatorUsername}\')")
+        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USER) VALUES (\'{groupname}\', \'{key}\', \'{creatorUsername}\')")
 
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+        return False
+
+    return True
+
+
+def isGroupAdmin(groupName:str, username:str)->bool:
+    """Checks if a particular user is the admin of a group
+
+    :param groupName: name of the group
+    :type groupName: str
+    :param username: username to check
+    :type username: str
+    :return: whether username is an admin of the group
+    :rtype: bool
+    """
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        SELECT * FROM {groups_table_name} WHERE GROUPNAME = '{groupName}' AND CREATOR = '{username}'
+    ''')
+    names = cur.fetchall()
+    conn.close()
+    if len(names) != 0:
+        return True
+    else:
+        return False
+
+def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
+    try:
+        conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+        cur = conn.cursor()
+        cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USER) VALUES (\'{groupname}\', \'{usersGroupKey}\', \'{username}\')")
         conn.commit()
         conn.close()
     except Exception as e:
