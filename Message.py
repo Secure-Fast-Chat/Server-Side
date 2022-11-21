@@ -41,12 +41,13 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
+        self.username = ""
         try:
             # breakpoint()
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
         except:
             self.username = ""
-        self.online = 0
+        self.online = self.username != "" and self.username in LOGGED_CLIENTS.keys()
 
     @classmethod 
     def fromSelKey(cls, selectorKey):
@@ -166,6 +167,8 @@ class Message:
             content = json.loads(content)
             self._process_signup_pass(content["password"], content["e2eKey"])
             return 1
+        if not self.online:
+            return 1
         if(request == "get-key"):
             print(content)
             self._send_rcvr_key(json_header["recvr-username"]) # Get the public key of a given user
@@ -243,7 +246,7 @@ class Message:
             sender = self.username
         else:
             sender = grp_uid + "::" + self.username
-        timestamp = str(datetime.datetime.now())
+        timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         sent = False
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
