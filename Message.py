@@ -240,7 +240,7 @@ class Message:
                 return 1
 
     def _send_msg(self, rcvr_uid, msg_type, content):
-        timestamp = str(datetime.datetime.now())
+        timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
             receiverSelKey = LOGGED_CLIENTS[rcvr_uid]

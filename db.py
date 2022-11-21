@@ -129,3 +129,14 @@ def getE2EPublicKey(user:str)->str:
         return None
     else:
         return names[0][0]
+
+def getUnsentMessages(username: str)->list:
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+
+    cur.execute(f'''SELECT * FROM {messages_table_name} \
+      WHERE RECEIVER LIKE \'%::{username}\' ORDER BY TIMESTAMP''')
+    messages = cur.fetchall()
+    conn.commit()
+    conn.close()
+    return messages
