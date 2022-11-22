@@ -226,6 +226,8 @@ class Message:
             if(self.username not in grp_members):
                 response = 1
             for member in grp_members:
+                if(member == self.username):
+                     continue
                 self._send_msg(member, msg_type, content, grp_uid = grp_uid)
         self._data_to_send = struct.pack('>H',response)
         self._send_data_to_client()
