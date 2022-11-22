@@ -47,6 +47,13 @@ class Message:
 
     @classmethod 
     def fromSelKey(cls, selectorKey):
+        """Custom constructor to initialise a message given just the selector key
+
+        :param selectorKey: the selector key containitnall the data
+        :type selectorKey: SelectorKey
+        :return: Message
+        :rtype: Message
+        """
         socket = selectorKey.fileobj
         request_content=""
         sel=selectorKey
@@ -54,17 +61,24 @@ class Message:
         
         return cls(socket, 0, request_content, sel)
 
-    def _send_data_to_client(self, encrypted=True):
-        """ Function to send the string to the client. It sends content of _send_data_to_client to the client
-
+    def _send_data_to_client(self):
+        """Function to send the string to the client. It sends content of _send_data_to_client to the client.
         """
+        # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
         self.socket.sendall(left_message)
         # left_message = left_message[bytes_sent:]
 
         return
 
-    def encrypt(self, data):
+    def encrypt(self, data: bytes)->bytes:
+        """_summary_
+
+        :param data: the data to encrypt
+        :type data: bytes
+        :return: Encrypted Message
+        :rtype: bytes
+        """
         return self.sel.data["box"].encrypt(data)
     
     def _recv_data_from_client(self,size:int, encrypted=True)->int:
@@ -94,8 +108,10 @@ class Message:
 
     def _send_msg_to_reciever(self, rcvr_sock):
         """Function to send message to a reciever
+
+        :param rcvr_sock: The socket to which to send
+        :type rcvr_sock: Socket
         """
-        # left_message = self.sel.data["box"].encrypt(self._data_to_send)
         rcvr_sock.sendall(self._data_to_send)
 
     def _json_encode(self, obj, encoding):
@@ -218,10 +234,8 @@ class Message:
         :param new_uid: user id of the new user which is to be added in the group
         :type new_uid: str
         :param user_grp_key: Public key of the group
-        "type user_grp_key: str"""
-        ##Pending Implementation
-        #check_grp_uid returns 1 if grp_uid already exists else return 0
-        #check_uid_exists returns 1 if new_uid is valid else return 0
+        :type user_grp_key: str"""
+        
         grpNameFree = checkIfGroupNameFree(grp_uid)
         user_exists = not checkIfUsernameFree(new_uid)
         if grpNameFree:
@@ -259,7 +273,14 @@ class Message:
             else:
                 return 1
 
-    def _send_group_key(self, grp_name:str, username:str):
+    def _send_group_key(self, grp_name:str, username:str)->None:
+        """Sends a json response containing the group key for a particular user, which can be decrypted by only that user to get the actual private key
+
+        :param grp_name: name of the group
+        :type grp_name: str
+        :param username: name of the user
+        :type username: str
+        """
         grpKey, creatorPubKey = getUsersGroupKey(grp_name, username) 
         jsonheader ={
                 "byteorder": sys.byteorder,
@@ -271,7 +292,7 @@ class Message:
         proto_header = struct.pack('>H', len(encoded_json_header))
 
         self._data_to_send = proto_header + encoded_json_header
-        self._send_msg_to_reciever(self.sel.fileobj)
+        self._send_data_to_client()
 
 
     def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
@@ -390,11 +411,7 @@ class Message:
         :param password: Password of the Client to be logged in
         :type password: str 
         """
-        ## Pending Imlementation
-        #Required: check_login_uid returns token if uid is valid, else returns 0
-        ##
         pwd_success = db_login(username, password) # Returns 1 if username and password match, else 0
-        ##
         if(pwd_success == 1):
             self.status = "logged_in"
             ## online is 1 when user is logged in
@@ -418,60 +435,66 @@ class Message:
             self._data_to_send = self._login_failed()
             self._send_data_to_client()
         
-    def _login_failed(self):
+    def _login_failed(self)->bytes:
+        """Returns the response to send after a failed login attempt
+
+        :return: reponse after failed login
+        :rtype: bytes
+        """
         print("Login failed")
         return struct.pack('>H', 1)
 
-    def _login_successful(self):
+    def _login_successful(self)->bytes:
+        """Returns the response after a succesful login
+        :return: response after a succesful login
+        :rtype: bytes
+        """
         print("login success")
         return struct.pack('>H', 0)
 
-    def _successfully_found_login_uid(self, token):
-        global ENCODING_USED
-        jsonheader = {
-            "byteorder": sys.byteorder,
-            "uid_found": 1,
-            "logintoken": token,
-            "content-length": 0
-        }
-        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
-        encoded_json_header = self.encrypt(encoded_json_header)
-        proto_header = struct.pack('>H',len(encoded_json_header))
-        return proto_header +encoded_json_header
+    def _signup_failed(self)->bytes:
+        """Returns the response to send after a failed signup attempt
 
-    def _signup_failed(self):
-        print("Signup failes")
+        :return: reponse after failed signup
+        :rtype: bytes
+        """ 
+        print("Signup failed")
         return struct.pack('>H',2)
     
-    def _successfully_signed_up(self):
+    def _successfully_signed_up(self)->bytes:
+        """Returns the response to send after a succesful login attempt
+
+        :return: reponse after succesful login
+        :rtype: bytes
+        """
         print("Signup worked")
         return struct.pack('>H',1)
 
-    def _process_signup_uid(self,uid):
+    def _process_signup_uid(self,uid:str)->None:
         """Processes Signup Request by validating if requested Uid already exists or not
         :param uid: User ID of new user
         :type uid: str
         """
-        ## Pending Implementation
-        #Required: checkuid returns key, if uid is available to be used, else returns 0
         uid_free = checkIfUsernameFree(uid)
         print("Checking if UID is free")
         ##
         if not uid_free:
-            print("Not free")
             self._data_to_send = self._signup_uid_not_available()
             self._send_data_to_client()
         else:
-            print("Free")
             self.sel.data["username"] = uid
             self._data_to_send = self._signup_uid_available() 
             self._send_data_to_client()
             #Storing uid in socket's data
             self.username = uid
-            # self.processTask() #Immediately wait for next message, which would contain the password
         return
 
-    def _signup_uid_not_available(self):
+    def _signup_uid_not_available(self)->bytes:
+        """Returns the response to send if the username is already taken
+
+        :return: protoheader + a json header saying that the availability is 0 
+        :rtype: bytes
+        """
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
@@ -483,7 +506,12 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header +encoded_json_header
     
-    def _signup_uid_available(self):
+    def _signup_uid_available(self)->bytes:
+        """Returns the response to send if the username is free
+
+        :return: protoheader + a json header saying that the availability is 1
+        :rtype: bytes
+        """
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
@@ -495,7 +523,7 @@ class Message:
         proto_header = struct.pack('>H',len(encoded_json_header))
         return proto_header + encoded_json_header
     
-    def _process_signup_pass(self, password:str, e2eKey: str):
+    def _process_signup_pass(self, password:str, e2eKey: str)->None:
         """Process the command for signing up the user and storing the password
 
         :param password: The password
@@ -513,11 +541,21 @@ class Message:
             self._data_to_send = self._signup_failed()
             self._send_data_to_client()
 
-    def isOnline(self):
-        if(self.online):
-            return 1
-        else:
-            return 0
+    def isOnline(self)->bool:
+        """Returns if the user is online
 
-    def get_uid_selKey(self):
+        :return: Is the user online
+        :rtype: bool
+        """
+        if self.online:
+            return True
+        else:
+            return False
+
+    def get_uid_selKey(self)-> tuple[str, selectors.SelectorKey]:
+        """Helper function to get the username and selectorkey
+
+        :return: A tuples containing the username and selectorkey
+        :rtype: tuple[str, selectors.SelectorKey]
+        """
         return (self.username, self.sel)
