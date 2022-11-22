@@ -6,6 +6,8 @@ import selectors
 from nacl.public import PrivateKey, Box
 from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages
 import datetime
+import re
+
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
@@ -156,11 +158,6 @@ class Message:
             print("request is login")
             self._process_login(json_header["username"], json_header["password"]) 
             return 1
-        if(request == "add-mem"):
-            grp_uid = json_header["guid"]
-            new_uid = json_header["new-uid"]
-            user_grp_key = json_header["user-grp-key"]
-            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
         content_len = json_header['content-length']
         if content_len:
             self._recv_data_from_client(content_len)
@@ -194,7 +191,12 @@ class Message:
         if(request == "create-grp"):
             grp_uid = json_header["guid"]
             grp_key = json_header["group-key"]
-            return self._create_grp(grp_uid, grp_key)
+            self._create_grp(grp_uid, grp_key)
+        if(request == "add-mem"):
+            grp_uid = json_header["guid"]
+            new_uid = json_header["new-uid"]
+            user_grp_key = json_header["user-grp-key"]
+            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
         if(request == 'send-group-message'):
             grp_uid = json_header["guid"]
             msg_type = json_header["content-type"]
@@ -215,16 +217,18 @@ class Message:
         :param content: message to be sent
         :type content: str
         """
-        #check_grp_uid returns 1 if grp_uid already exists else return 0
+        response = 0
         grp_uid_exists = not checkIfGroupNameFree(grp_uid)
         if(not grp_uid_exists):
-            return 2 # Group does not exist
+            response = 2 # Group does not exist
         else:
             grp_members = getGroupMembers(grp_uid)
             if(self.username not in grp_members):
-                return 2
+                response = 1
             for member in grp_members:
                 self._send_msg(member, msg_type, content, grp_uid = grp_uid)
+        self._data_to_send = struct.pack('>H',response)
+        self._send_data_to_client()
             
     def _add_grp_mem(self, grp_uid, new_uid, user_grp_key):
         """Function to add a new member in the group
@@ -238,19 +242,22 @@ class Message:
         
         grpNameFree = checkIfGroupNameFree(grp_uid)
         user_exists = not checkIfUsernameFree(new_uid)
+        response = 1
         if grpNameFree:
-            return 1
+            response = 1
         else:
             valid_admin = isGroupAdmin(grp_uid, self.username) # True if admin
             if not valid_admin:
-                return 2
+                response = 2
             elif not user_exists:
-                return 3
+                response = 3
             elif new_uid in getGroupMembers(grp_uid):
-                return 4
+                response = 4
             else:
                 addUserToGroup(grp_uid, new_uid, user_grp_key)
-                return 0
+                response = 0
+        self._data_to_send = struct.pack('>H',response)
+        self._send_data_to_client()
 
     def _create_grp(self, grp_uid:str, grp_key:str):
         """Creates a new group
@@ -478,6 +485,7 @@ class Message:
         :param uid: User ID of new user
         :type uid: str
         """
+
         uid_free = checkIfUsernameFree(uid)
         print("Checking if UID is free")
         ##
