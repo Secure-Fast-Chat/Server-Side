@@ -307,7 +307,7 @@ class Message:
         self._data_to_send = proto_header + encoded_json_header
         self._send_data_to_client()
 
-    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
+    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None, timestamp = None):
         """Sends messages to the specified user
 
         :param rcvr_uid: User ID of the reciever client
@@ -326,7 +326,8 @@ class Message:
                 sender = self.username
             else:
                 sender = grp_uid + "::" + self.username
-        timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+        if not timestamp:
+            timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         sent = False
         if(rcvr_uid in LOGGED_CLIENTS.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
@@ -446,7 +447,7 @@ class Message:
                     guid = None
                     if("::" in sender):
                         guid = sender[0:sender.find("::")]
-                    self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender)
+                    self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender,timestamp = timestamp)
                 # TODO: Send unread messages to user
 
             else:
@@ -516,7 +517,6 @@ class Message:
         return
 
     def _invalid_uid_type(self):
-
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
