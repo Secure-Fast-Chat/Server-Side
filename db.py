@@ -142,7 +142,7 @@ def getUnsentMessages(username: str)->list:
     cur = conn.cursor()
 
     cur.execute(f'''SELECT * FROM {messages_table_name} \
-      WHERE RECEIVER='{username}' ORDER BY TIMESTAMP''')
+      WHERE RECEIVER='{username}' OR RECEIVER LIKE \'%::{username}\' ORDER BY TIMESTAMP''')
     messages = cur.fetchall()
     cur.execute(f'''DELETE FROM {messages_table_name} \
       WHERE RECEIVER='{username}' 
