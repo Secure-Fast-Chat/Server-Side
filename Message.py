@@ -520,6 +520,11 @@ class Message:
         return
 
     def _invalid_uid_type(self):
+        """Returns the response to send if the username is of the wrong type
+
+        :return: protoheader + a json header which does not containt the availability key
+        :rtype: bytes
+        """
         global ENCODING_USED
         jsonheader = {
             "byteorder": sys.byteorder,
