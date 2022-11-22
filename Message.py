@@ -263,15 +263,19 @@ class Message:
         :rtype: int
         """
         grpNameFree = checkIfGroupNameFree(grp_uid)
+        response = 1
         if not grpNameFree:
-            return 1
+            response = 1
         else:
             grp_created = createGroup(grp_uid, grp_key, self.username, getE2EPublicKey(self.username)) #True if group created successfully
 
             if grp_created:
-                return 0
+                response = 0
             else:
-                return 1
+                response = 1
+
+        self._data_to_send = struct.pack('>H',response)
+        self._send_data_to_client()
 
     def _send_group_key(self, grp_name:str, username:str)->None:
         """Sends a json response containing the group key for a particular user, which can be decrypted by only that user to get the actual private key
