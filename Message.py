@@ -196,16 +196,38 @@ class Message:
             grp_uid = json_header["guid"]
             new_uid = json_header["new-uid"]
             user_grp_key = json_header["user-grp-key"]
-            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
+            self._add_grp_mem(grp_uid, new_uid, user_grp_key)
+        if(request == "remove-mem"):
+            grp_uid = json_header["guid"]
+            uid = json_header["uid"]
+            self._rem_grp_mem(grp_uid, uid)
         if(request == 'send-group-message'):
             grp_uid = json_header["guid"]
             msg_type = json_header["content-type"]
-            return self._send_grp_message(grp_uid, msg_type, content)
+            self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
-            return self._send_group_key(json_header["group-name"], self.username)
+            self._send_group_key(json_header["group-name"], self.username)
         print("Unknown request")
         print(request)
         return 1
+
+    def _rem_grp_mem(self, grp_uid, uid):
+        response = 0
+        grp_uid_exists = not checkIfGroupNameFree(grp_uid)
+        if(not grp_uid_exists):
+            response = 1 # Group does not exist
+        else:
+            userList = getGroupMembers(grp_uid)
+            valid_admin = isGroupAdmin(grp_uid, self.username) # True if admin
+            if not valid_admin:
+                response = 2
+            elif(uid not in userList):
+                response = 3
+            else:
+                removeGroupMember(grp_uid, uid)
+                response = 0
+        self._data_to_send = struct.pack('>H',response)
+        self._send_data_to_client()
 
     def _send_grp_message(self, grp_uid, msg_type, content):
         """Send messages in a group
