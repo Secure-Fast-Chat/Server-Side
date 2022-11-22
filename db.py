@@ -265,6 +265,7 @@ def getGroupMembers(groupname: str)->list[str]:
     return names
  
 def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
+
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
@@ -281,3 +282,19 @@ def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
     keys = cur.fetchall()
     creatorE2EKey = keys[0][0]
     return encryptedGroupUserKey, creatorE2EKey
+
+def removeGroupMember(groupname: str, username: str):
+    """Remove a user from the db of a group
+
+    :param groupname: name of the group
+    :type groupname: str
+    :param username: username to remove
+    :type username: str
+    """
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        DELETE FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}' and USERNAME ='{username}'
+    ''')
+    cur.commit()
+    conn.close()
