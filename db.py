@@ -144,6 +144,9 @@ def getUnsentMessages(username: str)->list:
     cur.execute(f'''SELECT * FROM {messages_table_name} \
       WHERE RECEIVER='{username}' ORDER BY TIMESTAMP''')
     messages = cur.fetchall()
+    cur.execute(f'''DELETE FROM {messages_table_name} \
+      WHERE RECEIVER='{username}' 
+      ''')
     conn.commit()
     conn.close()
     return messages
