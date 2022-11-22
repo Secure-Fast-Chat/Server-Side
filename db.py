@@ -62,7 +62,6 @@ def createUser(username:str, password:str, e2ePublicKey:str)->bool:
 
     return True
 
-
 def db_login(username: str, password: str)->bool:
     """Checks if a given username password pair is present in the db
 
@@ -90,8 +89,6 @@ def db_login(username: str, password: str)->bool:
         except VerifyMismatchError:
             return False # Password did not match
         return False
-
-
 
 def storeMessageInDb(sender: str, receiver: str, message: str, timestamp:str, content_type: str):
     """stores the encrypted message in the database, in case it is not possible to send them the message directly
@@ -145,12 +142,11 @@ def getUnsentMessages(username: str)->list:
     cur = conn.cursor()
 
     cur.execute(f'''SELECT * FROM {messages_table_name} \
-      WHERE RECEIVER LIKE \'%::{username}\' ORDER BY TIMESTAMP''')
+      WHERE RECEIVER='{username}' ORDER BY TIMESTAMP''')
     messages = cur.fetchall()
     conn.commit()
     conn.close()
     return messages
-
 
 def checkIfGroupNameFree(groupName: str)-> bool:
     """Check if a given groupname is already in use
@@ -172,7 +168,6 @@ def checkIfGroupNameFree(groupName: str)-> bool:
     else:
         return False
  
-
 def createGroup(groupname:str, key:str, creatorUsername:str, creatorE2Ekey: str)->bool:
     """Creates a new group in the database
 
@@ -199,7 +194,6 @@ def createGroup(groupname:str, key:str, creatorUsername:str, creatorE2Ekey: str)
         return False
 
     return True
-
 
 def isGroupAdmin(groupName:str, username:str)->bool:
     """Checks if a particular user is the admin of a group
@@ -247,7 +241,6 @@ def getGroupMembers(groupname: str)->list[str]:
     names = list(list(zip(*names))[0])
     return names
  
-
 def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
