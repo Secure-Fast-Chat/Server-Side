@@ -395,6 +395,9 @@ class Message:
         self._recv_data_from_client(json_header_length, False)
         obj = self._recvd_msg
         json_header = json.loads(obj.decode(ENCODING_USED))
+        if 'request' not in json_header.keys():
+            #### PENDING ####
+            pass
         request = json_header["request"]
         if(request == "keyex"):
             clientPublicKey = json_header['key']
