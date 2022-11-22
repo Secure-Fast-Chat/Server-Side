@@ -419,29 +419,34 @@ class Message:
         :param password: Password of the Client to be logged in
         :type password: str 
         """
-        pwd_success = db_login(username, password) # Returns 1 if username and password match, else 0
-        if(pwd_success == 1):
-            self.status = "logged_in"
-            ## online is 1 when user is logged in
-            self.online = 1
-            self._data_to_send = self._login_successful()
-            self.sel.data["username"] = username
-            self.username = username
+        valid_uid = self.checkValidityOfUID(username)
+        if not valid_uid:
+            self._data_to_send = struct.pack('>H',3)
             self._send_data_to_client()
-            # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
-            unsent_messages = getUnsentMessages(self.username)
-            count = 0
-            for msg in unsent_messages:
-                (sender, rcvr, messg, timestamp, msgtype) = msg
-                guid = None
-                if("::" in sender):
-                    guid = sender[0:sender.find("::")]
-                self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender)
-            # TODO: Send unread messages to user
-
         else:
-            self._data_to_send = self._login_failed()
-            self._send_data_to_client()
+            pwd_success = db_login(username, password) # Returns 1 if username and password match, else 0
+            if(pwd_success == 1):
+                self.status = "logged_in"
+                ## online is 1 when user is logged in
+                self.online = 1
+                self._data_to_send = self._login_successful()
+                self.sel.data["username"] = username
+                self.username = username
+                self._send_data_to_client()
+                # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
+                unsent_messages = getUnsentMessages(self.username)
+                count = 0
+                for msg in unsent_messages:
+                    (sender, rcvr, messg, timestamp, msgtype) = msg
+                    guid = None
+                    if("::" in sender):
+                        guid = sender[0:sender.find("::")]
+                    self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender)
+                # TODO: Send unread messages to user
+
+            else:
+                self._data_to_send = self._login_failed()
+                self._send_data_to_client()
         
     def _login_failed(self)->bytes:
         """Returns the response to send after a failed login attempt
@@ -486,19 +491,50 @@ class Message:
         :type uid: str
         """
 
-        uid_free = checkIfUsernameFree(uid)
-        print("Checking if UID is free")
-        ##
-        if not uid_free:
-            self._data_to_send = self._signup_uid_not_available()
+        valid_uid = self.checkValidityOfUID(uid)
+        if not valid_uid:
+            self._data_to_send = self._invalid_uid_type()
             self._send_data_to_client()
         else:
-            self.sel.data["username"] = uid
-            self._data_to_send = self._signup_uid_available() 
-            self._send_data_to_client()
-            #Storing uid in socket's data
-            self.username = uid
+            uid_free = checkIfUsernameFree(uid)
+            print("Checking if UID is free")
+            ##
+            if not uid_free:
+                self._data_to_send = self._signup_uid_not_available()
+                self._send_data_to_client()
+            else:
+                self.sel.data["username"] = uid
+                self._data_to_send = self._signup_uid_available() 
+                self._send_data_to_client()
+                #Storing uid in socket's data
+                self.username = uid
         return
+
+    def _invalid_uid_type(self):
+
+        global ENCODING_USED
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "content-length": 0
+        }
+        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
+        proto_header = struct.pack('>H',len(encoded_json_header))
+        return proto_header +encoded_json_header
+
+    def checkValidityOfUID(self, uid):
+        """ Function to check if the uid is valid. A valid uid is one which has only a-z,A-Z,0-9,_ characters
+
+        :param uid: User id to check for
+        :type uid: str
+        :return: Return True if valid
+        :rtype: bool
+        """
+
+        pattern = re.compile(r'[a-zA-Z0-9_]+')
+        if not re.fullmatch(pattern,uid):
+            return False
+        return True
 
     def _signup_uid_not_available(self)->bytes:
         """Returns the response to send if the username is already taken
