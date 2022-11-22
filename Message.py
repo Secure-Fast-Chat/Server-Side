@@ -441,7 +441,7 @@ class Message:
                 count = 0
                 for msg in unsent_messages:
                     (sender, rcvr, messg, timestamp, msgtype) = msg
-                    messg = messg.decode(ENCODING_USED)
+                    messg = messg.encode(ENCODING_USED)
                     guid = None
                     if("::" in sender):
                         guid = sender[0:sender.find("::")]
