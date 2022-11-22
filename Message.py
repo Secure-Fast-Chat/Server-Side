@@ -142,6 +142,11 @@ class Message:
             print("request is login")
             self._process_login(json_header["username"], json_header["password"]) 
             return 1
+        if(request == "add-mem"):
+            grp_uid = json_header["guid"]
+            new_uid = json_header["new-uid"]
+            user_grp_key = json_header["user-grp-key"]
+            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
         content_len = json_header['content-length']
         if content_len:
             self._recv_data_from_client(content_len)
@@ -151,7 +156,7 @@ class Message:
         ###################################################################
         ###################### ByteOrder Things ###########################
         ###################################################################
-        if(request == "send-msg"):
+        if(request == "send-msg" or request == "send-group-message"):
             content = content_obj
         else:
             content = content_obj.decode(ENCODING_USED)
@@ -176,15 +181,14 @@ class Message:
             grp_uid = json_header["guid"]
             grp_key = json_header["group-key"]
             return self._create_grp(grp_uid, grp_key)
-        if(request == "add-mem"):
-            grp_uid = json_header["guid"]
-            new_uid = json_header["new-uid"]
-            user_grp_key = json_header["user-grp-key"]
-            return self._add_grp_mem(grp_uid, new_uid, user_grp_key)
         if(request == 'send-group-message'):
             grp_uid = json_header["guid"]
             msg_type = json_header["content-type"]
             return self._send_grp_message(grp_uid, msg_type, content)
+        if request == "grp-key":
+            return self._send_group_key(json_header["group-name"], self.username)
+        print("Unknown request")
+        print(request)
         return 1
 
     def _send_grp_message(self, grp_uid, msg_type, content):
@@ -221,7 +225,6 @@ class Message:
         grpNameFree = checkIfGroupNameFree(grp_uid)
         user_exists = not checkIfUsernameFree(new_uid)
         if grpNameFree:
-            # Group does not exist
             return 1
         else:
             valid_admin = isGroupAdmin(grp_uid, self.username) # True if admin
@@ -229,9 +232,9 @@ class Message:
                 return 2
             elif not user_exists:
                 return 3
+            elif new_uid in getGroupMembers(grp_uid):
+                return 4
             else:
-                #Pending Implementation
-                #add_new_user_in_grp 
                 addUserToGroup(grp_uid, new_uid, user_grp_key)
                 return 0
 
@@ -255,6 +258,21 @@ class Message:
                 return 0
             else:
                 return 1
+
+    def _send_group_key(self, grp_name:str, username:str):
+        grpKey, creatorPubKey = getUsersGroupKey(grp_name, username) 
+        jsonheader ={
+                "byteorder": sys.byteorder,
+                'group-key': grpKey,
+                'creatorPubKey' : creatorPubKey,
+            } 
+        encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+        encoded_json_header = self.encrypt(encoded_json_header)
+        proto_header = struct.pack('>H', len(encoded_json_header))
+
+        self._data_to_send = proto_header + encoded_json_header
+        self._send_msg_to_reciever(self.sel.fileobj)
+
 
     def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
         """Sends messages to the specified user
@@ -280,6 +298,7 @@ class Message:
             # We'll need to do find out the receiver's keys and box and send the message to them
             receiverSelKey = LOGGED_CLIENTS[rcvr_uid]
             box = receiverSelKey.data["box"]
+            # breakpoint()
             content = box.encrypt(content)
             jsonheader = {
                 "byteorder": sys.byteorder,
@@ -292,8 +311,9 @@ class Message:
             }
             if grp_uid:
                 jsonheader['sender-type'] = 'group'
-                jsonheader['group-key'], jsonheader['creatorPubkey'] = getUsersGroupKey(grp_uid)
+                jsonheader['group-key'], jsonheader['creatorPubKey'] = getUsersGroupKey(grp_uid, rcvr_uid)
                 
+            print(f"Sending messages {jsonheader}")
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
             encoded_json_header = box.encrypt(encoded_json_header)
             proto_header = struct.pack('>H', len(encoded_json_header))
@@ -306,6 +326,8 @@ class Message:
             #     sent = True
             ##!!
         if not sent:
+            print("Storing message")
+            # breakpoint()
             storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:

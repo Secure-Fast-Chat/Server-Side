@@ -225,6 +225,7 @@ def isGroupAdmin(groupName:str, username:str)->bool:
 
 def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
     try:
+        print("Adding user to group")
         conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
         cur = conn.cursor()
         cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USERNAME) VALUES (\'{groupname}\', \'{usersGroupKey}\', \'{username}\')")
@@ -240,7 +241,7 @@ def getGroupMembers(groupname: str)->list[str]:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        SELECT * FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}'
+        SELECT USERNAME FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}'
     ''')
     names = cur.fetchall()
     names = list(list(zip(*names))[0])
