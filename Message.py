@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages
 import datetime
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -207,6 +207,7 @@ class Message:
 
     def _send_grp_message(self, grp_uid, msg_type, content):
         """Send messages in a group
+
         :param grp_uid: Id of the group in which message is to be sent
         :type grp_uid: str
         :param msg_type: Type of message to be send, text or file object
@@ -227,6 +228,7 @@ class Message:
             
     def _add_grp_mem(self, grp_uid, new_uid, user_grp_key):
         """Function to add a new member in the group
+
         :param grp_uid: id of the group in which member is to be added
         :type grp_uid: str
         :param new_uid: user id of the new user which is to be added in the group
@@ -400,6 +402,7 @@ class Message:
     def _process_login(self, username, password):
         """Processes Login Request
         On successful login sends pending messages
+
         :param username: Username of the Client to be logged in 
         :type username: str
         :param password: Password of the Client to be logged in
@@ -415,7 +418,7 @@ class Message:
             self.username = username
             self._send_data_to_client()
             # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
-            unsent_messages = DatabaseRequestHandler.getUnsentMessages(self.username)
+            unsent_messages = getUnsentMessages(self.username)
             count = 0
             for msg in unsent_messages:
                 (sender, rcvr, messg, timestamp, msgtype) = msg
@@ -440,6 +443,7 @@ class Message:
 
     def _login_successful(self)->bytes:
         """Returns the response after a succesful login
+
         :return: response after a succesful login
         :rtype: bytes
         """
@@ -466,6 +470,7 @@ class Message:
 
     def _process_signup_uid(self,uid:str)->None:
         """Processes Signup Request by validating if requested Uid already exists or not
+
         :param uid: User ID of new user
         :type uid: str
         """
