@@ -67,8 +67,6 @@ class Message:
         # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
         self.socket.sendall(left_message)
-        # left_message = left_message[bytes_sent:]
-
         return
 
     def encrypt(self, data: bytes)->bytes:
@@ -294,9 +292,9 @@ class Message:
         self._data_to_send = proto_header + encoded_json_header
         self._send_data_to_client()
 
-
     def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None):
         """Sends messages to the specified user
+
         :param rcvr_uid: User ID of the reciever client
         :type rcvr_uid: str
         :param msg_type: Type of message, text or file 
@@ -353,15 +351,11 @@ class Message:
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         """Gets the public key of a given user
+
         :param rcvr_uid: User id of the user whose public key is requested
         :type rcvr_uid: str
         """
         publickey = getE2EPublicKey(rcvr_uid)
-        if publickey is None:
-            # User does not exist
-            # TODO
-            return 0
-        
         jsonheader = {
             "byteorder": sys.byteorder,
             "key": publickey
@@ -400,7 +394,7 @@ class Message:
             # Command to use for unpacking of proto_header: 
             # struct.unpack('>H',proto_header)[0]
             self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
-            self._send_data_to_client(encrypted=False)
+            self._send_data_to_client()
             return clientPublicKey
  
     def _process_login(self, username, password):
