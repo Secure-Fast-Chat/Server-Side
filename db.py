@@ -3,6 +3,7 @@ import psycopg2
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError 
 import nacl
+import datetime
 dbName = "mydb"
 
 users_table_name = "Users"
@@ -16,6 +17,24 @@ dbUser = "fasty"
 dbPass = "pass123"
 dbHost = "localhost"
 dbPort = 5432
+
+def deleteOldMessages():
+    """Delete messages older than 7 days (can change later)
+    This is called when we add some new message to the db
+    """
+    lastTimeStampToKeep = datetime.datetime.timestamp(datetime.datetime.now() - datetime.timedelta(days=7))
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''DELETE FROM {messages_table_name} \
+      WHERE TIMESTAMP < {lastTimeStampToKeep}
+      ''')
+    conn.commit()
+    conn.close()
+    return
+
+
+
+
 def checkIfUsernameFree(username: str) -> bool:
     """Check if a given username is already in use
 
@@ -108,6 +127,7 @@ def storeMessageInDb(sender: str, receiver: str, message: str, timestamp:str, co
 
     conn.commit()
     conn.close()
+    deleteOldMessages()
     return
 
 def getE2EPublicKey(user:str)->str:
@@ -145,7 +165,7 @@ def getUnsentMessages(username: str)->list:
       WHERE RECEIVER='{username}' OR RECEIVER LIKE \'%::{username}\' ORDER BY TIMESTAMP''')
     messages = cur.fetchall()
     cur.execute(f'''DELETE FROM {messages_table_name} \
-      WHERE RECEIVER='{username}' 
+      WHERE RECEIVER='{username}' OR RECEIVER LIKE \'%::{username}\'
       ''')
     conn.commit()
     conn.close()
