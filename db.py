@@ -4,6 +4,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError 
 import nacl
 import datetime
+from typing import List, Tuple
 dbName = "mydb"
 
 users_table_name = "Users"
@@ -254,7 +255,7 @@ def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
 
     return True
 
-def getGroupMembers(groupname: str)->list[str]:
+def getGroupMembers(groupname: str)->List[str]:
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
@@ -264,7 +265,7 @@ def getGroupMembers(groupname: str)->list[str]:
     names = list(list(zip(*names))[0])
     return names
  
-def getUsersGroupKey(groupname: str, username: str)-> tuple[str, str]:
+def getUsersGroupKey(groupname: str, username: str)-> Tuple[str, str]:
 
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
