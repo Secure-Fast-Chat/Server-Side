@@ -344,6 +344,7 @@ class Message:
                 'sender-type': 'user',
             }
             if grp_uid:
+                jsonheader['sender_e2e_public_key'] = getE2EPublicKey(sender.split("::")[1])
                 jsonheader['sender-type'] = 'group'
                 jsonheader['group-key'], jsonheader['creatorPubKey'] = getUsersGroupKey(grp_uid, rcvr_uid)
                 
