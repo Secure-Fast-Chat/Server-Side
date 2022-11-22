@@ -435,6 +435,7 @@ class Message:
                 self.sel.data["username"] = username
                 self.username = username
                 self._send_data_to_client()
+                LOGGED_CLIENTS[self.username] = self.sel
                 # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
                 unsent_messages = getUnsentMessages(self.username)
                 count = 0

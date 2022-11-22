@@ -43,9 +43,10 @@ def service(key, mask):
     message =  Message.Message.fromSelKey(key)
     global sel
     if message.processTask() != -1:
-        uid, selKey = message.get_uid_selKey()
-        if uid != "":
-            Message.LOGGED_CLIENTS[uid] = selKey
+        pass
+        # uid, selKey = message.get_uid_selKey()
+        # if uid != "":
+        #     Message.LOGGED_CLIENTS[uid] = selKey
     else:
         uid, selKey = message.get_uid_selKey()
         sock = selKey.fileobj
