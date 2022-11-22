@@ -338,7 +338,7 @@ class Message:
                 "byteorder": sys.byteorder,
                 "content-length": len(content),
                 "sender": sender,
-                "sender_e2e_public_key": getE2EPublicKey(self.username),
+                "sender_e2e_public_key": getE2EPublicKey(sender),
                 "content-type": msg_type,
                 "timestamp": timestamp,
                 'sender-type': 'user',
