@@ -7,6 +7,7 @@ from nacl.public import PrivateKey, Box
 from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages
 import datetime
 import re
+from typing import Tuple
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
@@ -634,7 +635,7 @@ class Message:
         else:
             return False
 
-    def get_uid_selKey(self)-> tuple[str, selectors.SelectorKey]:
+    def get_uid_selKey(self)-> Tuple[str, selectors.SelectorKey]:
         """Helper function to get the username and selectorkey
 
         :return: A tuples containing the username and selectorkey
