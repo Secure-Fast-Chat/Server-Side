@@ -14,6 +14,7 @@ ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
 LOGGED_CLIENTS = None
 
+# LB_SOCKET = 
 class Message:
     """This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class
 
@@ -208,8 +209,8 @@ class Message:
             self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
             self._send_group_key(json_header["group-name"], self.username)
-        print("Unknown request")
-        print(request)
+        # print("Unknown request")
+        # print(request)
         return 1
 
     def _rem_grp_mem(self, grp_uid, uid):

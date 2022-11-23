@@ -11,7 +11,4 @@ Tech Stack Used:
 ppt:
     Tables in database and what is stored: SqlCommandsinit.text
 
-# Remove From Group
-# Delete delivered messages from database
-# Delete messages from database after certain time
 # Load Balancer

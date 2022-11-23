@@ -8,8 +8,7 @@ import json
 from nacl.public import PrivateKey, Box
 import nacl
 from nacl.encoding import Base64Encoder
-HOST = "127.0.0.1"
-PORT = 8000
+
 ENCODING_USED = "utf-8"
 
 def accept(sel, sock):
@@ -18,8 +17,8 @@ def accept(sel, sock):
     print(f"{sock=}")
     conn, addr = sock.accept()
     print(f"Connected by {addr}")
+    global privatekey
     
-    privatekey = PrivateKey.generate()
     publickey = privatekey.public_key
     message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, sel)
 
@@ -55,7 +54,9 @@ def service(key, mask):
         if(uid!=""):
             del Message.LOGGED_CLIENTS[uid]
 
-if __name__ == "__main__":
+def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
+    global privatekey
+    privatekey = pvtKey
     global sel
     sel = selectors.DefaultSelector()
     Message.LOGGED_CLIENTS = {}
@@ -80,3 +81,6 @@ if __name__ == "__main__":
         print("Caught keyboard interrupt, exiting")
     finally:
         sel.close()
+
+if __name__ == "__main__":
+    startServer(pvtKey=PrivateKey.generate())
