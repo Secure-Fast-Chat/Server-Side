@@ -6,9 +6,6 @@ from startServer import startServer
 from nacl.public import PrivateKey
 from typing import Tuple
 import random
-import json
-import struct
-
 
 ENCODING_USED = "utf-8"
 LBHOST = "127.0.0.1"
