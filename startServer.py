@@ -5,6 +5,9 @@ from nacl.public import PrivateKey, Box
 import nacl
 from nacl.encoding import Base64Encoder
 import sys
+import struct
+import json
+
 ENCODING_USED = "utf-8"
 LOGGED_CLIENTS = {}
 LBSOCK = None
@@ -37,7 +40,7 @@ def accept(sel, sock):
     print("Accepted Client")
     ##!!
 
-def service(key, mask):
+def service(key, mask, HOST, PORT):
     ##!!
     print("Processing request")
     ##!!
@@ -46,10 +49,10 @@ def service(key, mask):
     message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
     global sel
     if message.processTask() != -1:
-        pass
         uid, selKey = message.get_uid_selKey()
         if uid != "":
             LOGGED_CLIENTS[uid] = selKey
+            send_lb_new_login_info(uid, HOST, PORT)
     else:
         uid, selKey = message.get_uid_selKey()
         sock = selKey.fileobj
@@ -57,6 +60,25 @@ def service(key, mask):
         sock.close()
         if(uid!=""):
             del LOGGED_CLIENTS[uid]
+            send_lb_logout_info(uid)
+
+def send_lb_logout_info(uid):
+    json_header = {
+        "byteorder": sys.byteorder,
+        "request": "user-logout",
+        "uid": uid,
+    }
+    LBSOCK.sendall(struct.pack('>H', len(json.dumps(json_header, ensure_ascii=False).encode(ENCODING_USED))) + json_header)
+
+def send_lb_new_login_info(uid, HOST, PORT):
+    json_header = {
+        "byteorder": sys.byteorder,
+        "request": "new-login",
+        "uid": uid,
+        "host": HOST,
+        "port": PORT
+    }
+    LBSOCK.sendall(struct.pack('>H', len(json.dumps(json_header, ensure_ascii=False).encode(ENCODING_USED))) + json_header)
 
 def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     global privatekey
@@ -85,7 +107,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
-                    service(key, mask)
+                    service(key, mask, HOST, PORT)
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:

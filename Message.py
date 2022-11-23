@@ -493,6 +493,7 @@ class Message:
                 self.username = username
                 self._send_data_to_client()
                 self.logged_clients[self.username] = self.sel
+                self._send_successful_login_info_to_lb()
                 # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
                 unsent_messages = getUnsentMessages(self.username)
                 count = 0
