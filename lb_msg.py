@@ -99,4 +99,5 @@ class NameItYourself:
                 'port' : port
                 }
         self._prepareMessage(header,encrypt = False)
+        print(self.socket)
         self._send_data_to_client()
