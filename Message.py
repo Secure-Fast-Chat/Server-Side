@@ -12,7 +12,6 @@ from typing import Tuple
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
-LOGGED_CLIENTS = None
 
 # LB_SOCKET = 
 class Message:
@@ -28,7 +27,7 @@ class Message:
     :type _recvd_msg: bytes
     """
 
-    def __init__(self,conn_socket,status,request,sel):
+    def __init__(self,conn_socket,status,request,sel, loggedClients):
         """Constructor Object
 
         :param conn_socket: Socket which has a connection with client
@@ -47,10 +46,11 @@ class Message:
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
         except:
             self.username = ""
-        self.online = self.username != "" and self.username in LOGGED_CLIENTS.keys()
+        self.online = self.username != "" and self.username in self.logged_clients.keys()
+        self.logged_clients = loggedClients
 
     @classmethod 
-    def fromSelKey(cls, selectorKey):
+    def fromSelKey(cls, selectorKey, loggedClients):
         """Custom constructor to initialise a message given just the selector key
 
         :param selectorKey: the selector key containitnall the data
@@ -61,9 +61,8 @@ class Message:
         socket = selectorKey.fileobj
         request_content=""
         sel=selectorKey
-        status = 0
         
-        return cls(socket, 0, request_content, sel)
+        return cls(socket, 0, request_content, sel, loggedClients)
 
     def _send_data_to_client(self):
         """Function to send the string to the client. It sends content of _send_data_to_client to the client.
@@ -353,9 +352,9 @@ class Message:
         if not timestamp:
             timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         sent = False
-        if(rcvr_uid in LOGGED_CLIENTS.keys()):
+        if(rcvr_uid in self.logged_clients.keys()):
             # We'll need to do find out the receiver's keys and box and send the message to them
-            receiverSelKey = LOGGED_CLIENTS[rcvr_uid]
+            receiverSelKey = self.logged_clients[rcvr_uid]
             box = receiverSelKey.data["box"]
             # breakpoint()
             content = box.encrypt(content)
@@ -464,7 +463,7 @@ class Message:
                 self.sel.data["username"] = username
                 self.username = username
                 self._send_data_to_client()
-                LOGGED_CLIENTS[self.username] = self.sel
+                self.logged_clients[self.username] = self.sel
                 # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
                 unsent_messages = getUnsentMessages(self.username)
                 count = 0

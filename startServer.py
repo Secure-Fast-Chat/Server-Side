@@ -10,7 +10,7 @@ import nacl
 from nacl.encoding import Base64Encoder
 
 ENCODING_USED = "utf-8"
-
+LOGGED_CLIENTS = {}
 def accept(sel, sock):
     """Function to accept a new client connection
     """
@@ -43,23 +43,23 @@ def service(key, mask):
     global sel
     if message.processTask() != -1:
         pass
-        # uid, selKey = message.get_uid_selKey()
-        # if uid != "":
-        #     Message.LOGGED_CLIENTS[uid] = selKey
+        uid, selKey = message.get_uid_selKey()
+        if uid != "":
+            LOGGED_CLIENTS[uid] = selKey
     else:
         uid, selKey = message.get_uid_selKey()
         sock = selKey.fileobj
         sel.unregister(sock)
         sock.close()
         if(uid!=""):
-            del Message.LOGGED_CLIENTS[uid]
+            del LOGGED_CLIENTS[uid]
 
 def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     global privatekey
     privatekey = pvtKey
     global sel
     sel = selectors.DefaultSelector()
-    Message.LOGGED_CLIENTS = {}
+    LOGGED_CLIENTS = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     lsock.bind((HOST,PORT))
