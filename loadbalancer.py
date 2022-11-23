@@ -56,15 +56,7 @@ def registerServer(addr: Tuple[str, int]):
     serverSockets[addr] = sock
 
 
-def sendHostDataToClient(sel, sock):
-    serverAddress = serverAddrs[getFreeServer]
-    header = {
-        'host': serverAddress[0],
-        'port': serverAddress[1],
-    }
-    header = json.dumps(header, ensure_ascii=False).encode("utf-8") #Don't need to send using a particular encoding, this will just be a string and int
-    protoheader = struct.pack(">H", len(header))
-    sock.sendall(protoheader + header)
+
 
     
         
