@@ -6,6 +6,9 @@ from startServer import startServer
 from nacl.public import PrivateKey
 from typing import Tuple
 import random
+import time
+import subprocess
+import atexit
 
 ENCODING_USED = "utf-8"
 LBHOST = "127.0.0.1"
@@ -21,42 +24,53 @@ def accept(sel, sock):
     
     lb_msg.NameItYourself(conn).processClient()
 
-    sock.close()
+    # sock.close()
     print("Connection Closed")
 #make a listening socket
 
 
 serverAddrs = lb_msg.SERVER_MAPPING
 
-global serverSockets
-serverSockets = {}
+serverSockets = lb_msg.SERVER_SOCKETS
 
 
-def registerServer(addr: Tuple[str, int]):
+def registerServer(addr: Tuple[str, int], index: int):
+    print("Registering server")
     global sel
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(addr)
     sock.setblocking(False)
     events = selectors.EVENT_READ
     sel.register(sock, events, data={addr})
+    print(addr)
     global serverSockets
-    serverSockets[addr] = sock
+    serverSockets[index] = sock
+
+
+def relayMessage(key, mask):
+    print(key.data)
+    length = key.fileobj.recv(2)
+    
+
 
         
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
 
-    serverSockets = []
     privateKey = PrivateKey.generate()
-    for i in serverAddrs:
-        startServer(privateKey,i[0], i[1])
-        registerServer(i)
+    for j in range(len(serverAddrs)):
+        i = serverAddrs[j]
+        command = f"python startServer.py {i[0]} {i[1]}"
+        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        atexit.register(process.kill)
+        time.sleep(1)
+        registerServer(i, j)
 
     lb_msg.LOGGED_CLIENTS = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    lsock.bind(LBHOST,LBPORT)
+    lsock.bind((LBHOST,LBPORT))
     lsock.listen()
     lsock.setblocking(False)
     
@@ -64,13 +78,16 @@ if __name__ == "__main__":
     try:
         while True:
             events = sel.select(timeout = None)
+
+
+            # print(events)
             for key, mask in events:
                 if key.data is None:
                     # New client tried to connect
                     accept(sel, key.fileobj)
                 else:
                     # Server is sending a message
-                    # relayMessage(key, mask)
+                    relayMessage(key, mask)
                     pass
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
