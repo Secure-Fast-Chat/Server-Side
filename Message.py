@@ -214,6 +214,17 @@ class Message:
             self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
             self._send_group_key(json_header["group-name"], self.username)
+        if request == "pls-relay":
+            receiver = json_header["receiver"]
+            msg_type = json_header["content-type"]
+            if "guid" in json_header.keys():
+                grp_uid = json_header["guid"]
+            else:
+                grp_uid = None
+            sender  =json_header["sender"]
+            timestamp  =json_header["timestamp"]
+            self._send_msg(receiver, msg_type, content, grp_uid, sender, timestamp, True)
+
         # print("Unknown request")
         # print(request)
         return 1
@@ -405,12 +416,14 @@ class Message:
                     "request": "pls-relay",
                     "content-length": len(content),
                     "sender": sender,
+                    "receiver": rcvr_uid,
                     "content-type": msg_type,
                     "timestamp": timestamp,
                     'sender-type': 'user',
                 }
                 if grp_uid:
                     jsonheader['sender-type'] = 'group'
+                    jsonheader["guid"] = grp_uid
                 encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
                 proto_header = struct.pack('>H', len(encoded_json_header))
                 self._data_to_send = proto_header + encoded_json_header + content
