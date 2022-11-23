@@ -26,21 +26,11 @@ def accept(sel, sock):
 #make a listening socket
 
 
-serverAddrs = [
-    ("127.0.0.1", 8001),
-    ("127.0.0.1", 8002),
-    ("127.0.0.1", 8003),
-    ("127.0.0.1", 8004),
-    ("127.0.0.1", 8005),
-]
-
-
+serverAddrs = lb_msg.SERVER_MAPPING
 
 global serverSockets
 serverSockets = {}
 
-def getFreeServer()->int:
-    return random.randint()%5
 
 def registerServer(addr: Tuple[str, int]):
     global sel
@@ -52,10 +42,6 @@ def registerServer(addr: Tuple[str, int]):
     global serverSockets
     serverSockets[addr] = sock
 
-
-
-
-    
         
 if __name__ == "__main__":
     global sel

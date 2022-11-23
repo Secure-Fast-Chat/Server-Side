@@ -2,14 +2,15 @@ import socket
 import json
 import struct
 import sys
+import random
 
-SERVER_MAPPING = {
-        0: ("127.0.0.1", 8001),
-        1: ("127.0.0.1", 8002),
-        2: ("127.0.0.1", 8003),
-        3: ("127.0.0.1", 8004),
-        4: ("127.0.0.1", 8005),
-    }
+SERVER_MAPPING = [
+        ("127.0.0.1", 8001),
+        ("127.0.0.1", 8002),
+        ("127.0.0.1", 8003),
+        ("127.0.0.1", 8004),
+        ("127.0.0.1", 8005),
+    ]
 
 LOGGED_CLIENTS = {}
 ENCODING_USED = 'utf-8'
@@ -50,7 +51,7 @@ class NameItYourself:
         :rtype: int
         """
 
-        server = random.randint()%len(SERVER_MAPPING.keys())
+        server = random.randint()%len(SERVER_MAPPING)
         print(f'Redirecting to server {server}')
         return server
     
