@@ -87,7 +87,8 @@ if __name__ == "__main__":
                     accept(sel, key.fileobj)
                 else:
                     # Server is sending a message
-                    relayMessage(key, mask)
+                    # relayMessage(key, mask)
+                    pass
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:
