@@ -1,15 +1,14 @@
 import lb_msg
 import selectors
 import socket
-import types
-import struct
-import json
 from nacl.public import PrivateKey, Box
-import nacl
-from nacl.encoding import Base64Encoder
-HOST = "127.0.0.1"
-PORT = 8080
+from startServer import startServer
+from nacl.public import PrivateKey
+
+
 ENCODING_USED = "utf-8"
+LBHOST = "127.0.0.1"
+LBPORT = 8000
 
 def accept(sel, sock):
     """Function to accept a new client connection
@@ -24,16 +23,33 @@ def accept(sel, sock):
     sel.unregister(sock)
     sock.close()
     print("Connection Closed")
+#make a listening socket
+
+serverAddrs = [
+    ("127.0.0.1", 8001),
+    ("127.0.0.1", 8002),
+    ("127.0.0.1", 8003),
+    ("127.0.0.1", 8004),
+    ("127.0.0.1", 8005),
+]
+
+
 
 
 
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
+
+    serverSockets = []
+    privateKey = PrivateKey.generate()
+    for i in serverAddrs:
+        startServer(privateKey,i[0], i[1])
+
     lb_msg.LOGGED_CLIENTS = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    lsock.bind((HOST,PORT))
+    lsock.bind(LBHOST,LBPORT)
     lsock.listen()
     lsock.setblocking(False)
     
@@ -42,12 +58,12 @@ if __name__ == "__main__":
         while True:
             events = sel.select(timeout = None)
             for key, mask in events:
+                print('going good ')
                 if key.data is None:
                     # New client tried to connect
                     accept(sel, key.fileobj)
                 else:
-                    # Server is sending a message
-                    # relayMessage(key, mask)
+                    service(key, mask)
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:
