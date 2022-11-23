@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages
+from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages, removeGroupMember
 import datetime
 import re
 from typing import Tuple
@@ -95,16 +95,16 @@ class Message:
 
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
-            print("hi,can you find bug")
+            # print("hi,can you find bug")
             data = self.socket.recv(size-len(self._recvd_msg))
             if not data:
                 print(f"close connection to {self.socket}")
                 return -1
             self._recvd_msg += data
-        print('hey there ',encrypted,self._recvd_msg)
+        # print('hey there ',encrypted,self._recvd_msg)
         if encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
-        print('ho',self._recvd_msg)
+        # print('ho',self._recvd_msg)
         return 1
 
     def _send_msg_to_reciever(self, rcvr_sock):
@@ -146,17 +146,17 @@ class Message:
         :rtype: int
         """
         if self._recv_data_from_client(2, False) != 1:
-            print("Connection closed")
+            # print("Connection closed")
             return -1 # Connection closed
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
         obj = self._recvd_msg
-        print(obj)
+        # print(obj)
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
         if request == "login":
-            print("request is login")
+            # print("request is login")
             self._process_login(json_header["username"], json_header["password"]) 
             return 1
         content_len = json_header['content-length']
@@ -173,10 +173,10 @@ class Message:
         else:
             content = content_obj.decode(ENCODING_USED)
         if(request == "signupuid"):
-            print("request is signupuid")
+            # print("request is signupuid")
             self._process_signup_uid(content)
         if(request == "signuppass"):
-            print("request is signuppass")
+            # print("request is signuppass")
             content = json.loads(content)
             self._process_signup_pass(content["password"], content["e2eKey"])
             return 1
@@ -208,8 +208,8 @@ class Message:
             self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
             self._send_group_key(json_header["group-name"], self.username)
-        print("Unknown request")
-        print(request)
+        # print("Unknown request")
+        # print(request)
         return 1
 
     def _rem_grp_mem(self, grp_uid, uid):
@@ -372,7 +372,7 @@ class Message:
                 jsonheader['sender-type'] = 'group'
                 jsonheader['group-key'], jsonheader['creatorPubKey'] = getUsersGroupKey(grp_uid, rcvr_uid)
                 
-            print(f"Sending messages {jsonheader}")
+            # print(f"Sending messages {jsonheader}")
             encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
             encoded_json_header = box.encrypt(encoded_json_header)
             proto_header = struct.pack('>H', len(encoded_json_header))
