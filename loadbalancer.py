@@ -20,12 +20,12 @@ def accept(sel, sock):
 
     print(f"{sock}")
     conn, addr = sock.accept()
-    print(f"Connected by {addr}")
+    # print(f"Connected by {addr}")
     
     lb_msg.NameItYourself(conn).processClient()
 
     # sock.close()
-    print("Connection Closed")
+    # print("Connection Closed")
 #make a listening socket
 
 
@@ -61,8 +61,9 @@ if __name__ == "__main__":
     privateKey = PrivateKey.generate()
     for j in range(len(serverAddrs)):
         i = serverAddrs[j]
+        myoutput = open('serveroutputs.txt', 'w')
         command = f"python startServer.py {i[0]} {i[1]}"
-        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        process = subprocess.Popen(command.split(), stdout=myoutput, stderr=myoutput)
         atexit.register(process.kill)
         time.sleep(1)
         registerServer(i, j)
