@@ -4,6 +4,10 @@ import socket
 from nacl.public import PrivateKey, Box
 from startServer import startServer
 from nacl.public import PrivateKey
+from typing import Tuple
+import random
+import json
+import struct
 
 
 ENCODING_USED = "utf-8"
@@ -20,10 +24,10 @@ def accept(sel, sock):
     
     lb_msg.NameItYourself(conn).processClient()
 
-    sel.unregister(sock)
     sock.close()
     print("Connection Closed")
 #make a listening socket
+
 
 serverAddrs = [
     ("127.0.0.1", 8001),
@@ -35,8 +39,35 @@ serverAddrs = [
 
 
 
+global serverSockets
+serverSockets = {}
+
+def getFreeServer()->int:
+    return random.randint()%5
+
+def registerServer(addr: Tuple[str, int]):
+    global sel
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(addr)
+    sock.setblocking(False)
+    events = selectors.EVENT_READ
+    sel.register(sock, events, data={addr})
+    global serverSockets
+    serverSockets[addr] = sock
 
 
+def sendHostDataToClient(sel, sock):
+    serverAddress = serverAddrs[getFreeServer]
+    header = {
+        'host': serverAddress[0],
+        'port': serverAddress[1],
+    }
+    header = json.dumps(header, ensure_ascii=False).encode("utf-8") #Don't need to send using a particular encoding, this will just be a string and int
+    protoheader = struct.pack(">H", len(header))
+    sock.sendall(protoheader + header)
+
+    
+        
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
@@ -45,6 +76,7 @@ if __name__ == "__main__":
     privateKey = PrivateKey.generate()
     for i in serverAddrs:
         startServer(privateKey,i[0], i[1])
+        registerServer(i)
 
     lb_msg.LOGGED_CLIENTS = {}
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,12 +90,12 @@ if __name__ == "__main__":
         while True:
             events = sel.select(timeout = None)
             for key, mask in events:
-                print('going good ')
                 if key.data is None:
                     # New client tried to connect
                     accept(sel, key.fileobj)
                 else:
-                    service(key, mask)
+                    # Server is sending a message
+                    relayMessage(key, mask)
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:
