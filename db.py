@@ -166,7 +166,7 @@ def getUnsentMessages(username: str)->list:
       WHERE RECEIVER='{username}' OR RECEIVER LIKE \'%::{username}\' ORDER BY TIMESTAMP''')
     messages = cur.fetchall()
     cur.execute(f'''DELETE FROM {messages_table_name} \
-      WHERE RECEIVER='{username}' OR RECEIVER LIKE \'%::{username}\'
+      WHERE RECEIVER='{username}'
       ''')
     conn.commit()
     conn.close()
@@ -266,7 +266,6 @@ def getGroupMembers(groupname: str)->List[str]:
     return names
  
 def getUsersGroupKey(groupname: str, username: str)-> Tuple[str, str]:
-
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
@@ -297,5 +296,5 @@ def removeGroupMember(groupname: str, username: str):
     cur.execute(f'''
         DELETE FROM {groups_members_table_name} WHERE GROUPNAME = '{groupname}' and USERNAME ='{username}'
     ''')
-    cur.commit()
+    conn.commit()
     conn.close()
