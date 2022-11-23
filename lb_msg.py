@@ -1,4 +1,6 @@
 import socket
+import json
+import struct
 import sys
 
 SERVER_MAPPING = {
@@ -57,11 +59,11 @@ class NameItYourself:
 
         return SERVER_MAPPING[server_id]
 
-    def _prepareMessage(header,content=b'',encrypt = True):
+    def _prepareMessage(self,json_header,content=b'',encrypt = True):
         """ Prepare the string to send from header and content and encrypt by default
 
-        :param header: Json Header with important headers. content-len and byteorder are added to header in the function
-        :type header: dict
+        :param json_header: Json Header with important headers. content-len and byteorder are added to header in the function
+        :type json_header: dict
         :param content: The content of the message(Optional,default = b'')
         :type content: bytes
         :param encrypt: If encryption is to be done(Optional, default = True)
@@ -70,9 +72,11 @@ class NameItYourself:
 
         if encrypt:
             pass
-        header['content-len'] = len(content)
-        header['byteorder'] = sys.byteorder
-        encoded_json_header = self._json_encode(header)
+        print(json_header)
+        print(content)
+        json_header['content-len'] = len(content)
+        json_header['byteorder'] = sys.byteorder
+        encoded_json_header = self._json_encode(json_header)
         protoheader = struct.pack(">H",len(encoded_json_header))
         self._msg_to_send = protoheader + encoded_json_header + content
         return
@@ -88,11 +92,11 @@ class NameItYourself:
         """ Function to redirect client
 
         """
-        server_id = _getAvailableServerID()
-        host,port = _getLsockFromID(server_id)
-        json_header = {
+        server_id = self._getAvailableServerID()
+        host,port = self._getLsockFromID(server_id)
+        header = {
                 'host' : host,
                 'port' : port
                 }
-        self._prepareMessage(json_header,encrypt = False)
+        self._prepareMessage(header,encrypt = False)
         self._send_data_to_client()
