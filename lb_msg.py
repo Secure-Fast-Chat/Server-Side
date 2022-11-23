@@ -4,8 +4,12 @@ import struct
 import sys
 
 SERVER_MAPPING = {
-        1 : ('localhost',8000)
-        }
+        0: ("127.0.0.1", 8001),
+        1: ("127.0.0.1", 8002),
+        2: ("127.0.0.1", 8003),
+        3: ("127.0.0.1", 8004),
+        4: ("127.0.0.1", 8005),
+    }
 
 LOGGED_CLIENTS = {}
 ENCODING_USED = 'utf-8'
@@ -46,7 +50,7 @@ class NameItYourself:
         :rtype: int
         """
 
-        server = 1
+        server = random.randint()%len(SERVER_MAPPING.keys())
         print(f'Redirecting to server {server}')
         return server
     
