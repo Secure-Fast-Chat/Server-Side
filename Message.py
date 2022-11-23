@@ -8,12 +8,13 @@ from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE
 import datetime
 import re
 from typing import Tuple
+# import loadbalancer
+# import startServer
 
 PROTOHEADER_LENGTH = 2 # to store length of protoheader
 ENCODING_USED = "utf-8" # to store the encoding used
                         # The program uses universal encoding
 
-# LB_SOCKET = 
 class Message:
     """This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class
 
@@ -27,7 +28,7 @@ class Message:
     :type _recvd_msg: bytes
     """
 
-    def __init__(self,conn_socket,status,request,sel, loggedClients):
+    def __init__(self,conn_socket,status,request,sel, loggedClients, lbsock):
         """Constructor Object
 
         :param conn_socket: Socket which has a connection with client
@@ -40,6 +41,7 @@ class Message:
         self.request_content = request
         self._data_to_send = b''
         self.sel = sel
+        self.logged_clients = loggedClients
         self.username = ""
         try:
             # breakpoint()
@@ -47,10 +49,11 @@ class Message:
         except:
             self.username = ""
         self.online = self.username != "" and self.username in self.logged_clients.keys()
-        self.logged_clients = loggedClients
+        
+        self.lbsock = lbsock
 
     @classmethod 
-    def fromSelKey(cls, selectorKey, loggedClients):
+    def fromSelKey(cls, selectorKey, loggedClients, lbsock):
         """Custom constructor to initialise a message given just the selector key
 
         :param selectorKey: the selector key containitnall the data
@@ -62,7 +65,7 @@ class Message:
         request_content=""
         sel=selectorKey
         
-        return cls(socket, 0, request_content, sel, loggedClients)
+        return cls(socket, 0, request_content, sel, loggedClients, lbsock)
 
     def _send_data_to_client(self):
         """Function to send the string to the client. It sends content of _send_data_to_client to the client.
@@ -96,7 +99,10 @@ class Message:
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
             # print("hi,can you find bug")
-            data = self.socket.recv(size-len(self._recvd_msg))
+            try:
+                data = self.socket.recv(size-len(self._recvd_msg))
+            except BlockingIOError:
+                return -1
             if not data:
                 print(f"close connection to {self.socket}")
                 return -1
@@ -145,7 +151,7 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        if self._recv_data_from_client(2, False) != 1:
+        if self._recv_data_from_client(2, False) != 1 or self._recvd_msg == b'':
             # print("Connection closed")
             return -1 # Connection closed
         packed_proto_header = self._recvd_msg
@@ -330,7 +336,7 @@ class Message:
         self._data_to_send = proto_header + encoded_json_header
         self._send_data_to_client()
 
-    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None, timestamp = None):
+    def _send_msg(self, rcvr_uid, msg_type, content, grp_uid = None, sender = None, timestamp = None, save=False):
         """Sends messages to the specified user
 
         :param rcvr_uid: User ID of the reciever client
@@ -341,8 +347,10 @@ class Message:
         :type content: str
         :param grp_uid: GroupId in case of group message
         :type grp_uid: str
-        :param sender: name of the message sender, in case of group chat, it is grp_id::user_id
+        :param sender: name of the message sender, in case of group chat, it is grp_id::user_id, otherwise it is username of self
         :type sender: str
+        :param save: whether to save if the receiver is not directly connected to the server
+        :type save: bool
         """
         if(sender is None):
             if not grp_uid:
@@ -385,9 +393,31 @@ class Message:
             #     sent = True
             ##!!
         if not sent:
-            print("Storing message")
-            # breakpoint()
-            storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
+            if save:
+                print("Storing message")
+                # breakpoint()
+                storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
+            else:
+                # send this data to load balancer
+                content = box.encrypt(content)
+                jsonheader = {
+                    "byteorder": sys.byteorder,
+                    "request": "pls-relay",
+                    "content-length": len(content),
+                    "sender": sender,
+                    "content-type": msg_type,
+                    "timestamp": timestamp,
+                    'sender-type': 'user',
+                }
+                if grp_uid:
+                    jsonheader['sender-type'] = 'group'
+                encoded_json_header = self._json_encode(jsonheader, ENCODING_USED)
+                proto_header = struct.pack('>H', len(encoded_json_header))
+                self._data_to_send = proto_header + encoded_json_header + content
+                self._send_msg_to_reciever(self.lbsock)
+
+
+
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         """Gets the public key of a given user
@@ -412,7 +442,8 @@ class Message:
         :return: public key of the client, encoded to base64
         :rtype: str
         """
-        self._recv_data_from_client(2, False) 
+        if self._recv_data_from_client(2, False) != 1:
+            return -1
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length, False)
@@ -421,24 +452,22 @@ class Message:
         if 'request' not in json_header.keys():
             #### PENDING ####
             pass
-        request = json_header["request"]
-        if(request == "keyex"):
-            clientPublicKey = json_header['key']
-            publickey = self.request_content['key']
-            jsonheader = {
-                "byteorder": sys.byteorder,
-                "request" : 'keyex',
-                "key": publickey,
-                "content-encoding" : ENCODING_USED,
-                
-            }
-            encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
-            proto_header = struct.pack('>H',len(encoded_json_header))
-            # Command to use for unpacking of proto_header: 
-            # struct.unpack('>H',proto_header)[0]
-            self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
-            self._send_data_to_client()
-            return clientPublicKey
+        clientPublicKey = json_header['key']
+        publickey = self.request_content['key']
+        jsonheader = {
+            "byteorder": sys.byteorder,
+            "request" : 'keyex',
+            "key": publickey,
+            "content-encoding" : ENCODING_USED,
+            
+        }
+        encoded_json_header = self._json_encode(jsonheader,ENCODING_USED)
+        proto_header = struct.pack('>H',len(encoded_json_header))
+        # Command to use for unpacking of proto_header: 
+        # struct.unpack('>H',proto_header)[0]
+        self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
+        self._send_data_to_client()
+        return clientPublicKey
  
     def _process_login(self, username, password):
         """Processes Login Request
