@@ -12,8 +12,8 @@ SERVER_MAPPING = [
         # ("127.0.0.1", 8005),
     ]
 
-LOGGED_CLIENTS = {}
-SERVER_SOCKETS = {}
+LOGGED_CLIENTS = {} # username: (host, port)
+SERVER_SOCKETS = {} # index: socket
 ENCODING_USED = 'utf-8'
 
 class NameItYourself:
@@ -113,7 +113,9 @@ class NameItYourself:
             serverSock = None
             if receiver_username in LOGGED_CLIENTS.keys():
                 # Send a relay request to the corresponding server
-                serverSock = LOGGED_CLIENTS[receiver_username] # TODO this line has error. Logged clients contains tuples of hostnam, port
+                address = LOGGED_CLIENTS[receiver_username] # TODO this line has error. Logged clients contains tuples of hostname, port
+                serverId = SERVER_MAPPING.index(address)
+                serverSock = self._getSocketFromID(serverId) 
             else:
                 serverSock = self._getSocketFromID(self._getAvailableServerID())
             self._prepareMessage(json_header, content)
