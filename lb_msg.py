@@ -15,6 +15,10 @@ SERVER_MAPPING = [
 LOGGED_CLIENTS = {} # username: (host, port)
 SERVER_SOCKETS = {} # index: socket
 ENCODING_USED = 'utf-8'
+STRATERGY = "random"
+# STRATERGY = "round-robin"
+NEXTSERVERID = 0
+SERVER_COUNT = [0 for i in SERVER_MAPPING]
 
 class NameItYourself:
     """ Class for conversation over sockets
@@ -45,17 +49,46 @@ class NameItYourself:
 
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
-    def _getAvailableServerID(self):
+    def _getAvailableServerID(self, stratergy):
         """ This function finds the server with least number of connections and returns the corresponding id.
 
         :return: The id of server to use
         :rtype: int
         """
 
+        if stratergy is "random":
+            return self._getRandomServer()
+        elif stratergy is "round-robin":
+            return self._getRoundRobinServer()
+        elif stratergy is "least-conn":
+            return self._getLeastConnServer()
+
+    def _getLeastConnServer(self):
+        """This function implements the least connection server Distribution
+        Returns the server_id with least number of connections
+        
+        :return: server id
+        :rtype: int"""
+        return SERVER_COUNT.index(min(SERVER_COUNT))
+
+    def _getRoundRobinServer(self):
+        """This function implements the round robin server Distribution
+        
+        :return: server id
+        :rtype: int"""
+        server = NEXTSERVERID
+        NEXTSERVERID = (NEXTSERVERID + 1)%len(SERVER_MAPPING)
+        return server
+
+    def _getRandomServer(self):
+        """This function implements the random server Distribution
+        
+        :return: server id
+        :rtype: int"""
         server = random.randint(0, len(SERVER_MAPPING)-1)
         print(f'Redirecting to server {server}')
         return server
-    
+
     def _getLsockHostPortFromID(self,server_id):
         """ Get the listening socket details from id
 
@@ -96,6 +129,8 @@ class NameItYourself:
         return
 
     def _readMessage(self):
+        """Returns the json_header and content of the message recieved
+        """
         header_len = self.socket.recv(2)
         header_len = struct.unpack('>H', header_len)[0]
         obj = self.socket.recv(header_len)
@@ -105,6 +140,8 @@ class NameItYourself:
         return json_header, content
     
     def processTask(self):
+        """Processes and redirects requests
+        """
         json_header, content = self._readMessage()
         request = json_header["request"]
         if request == "pls-relay":
@@ -124,9 +161,11 @@ class NameItYourself:
         if request == "new-login":
             print(f"New user logged in: {json_header['uid']}")
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
+            SERVER_COUNT[SERVER_MAPPING.getindex((json_header["host"], json_header["port"]))]+=1
         if request == "user-logout":
             print("User went out")
             del LOGGED_CLIENTS[json_header["uid"]]
+            SERVER_COUNT[SERVER_MAPPING.getindex(LOGGED_CLIENTS[json_header["uid"]])]-=1
             pass
 
     def _send_data_to_client(self):
@@ -140,7 +179,7 @@ class NameItYourself:
         """ Function to redirect client
 
         """
-        server_id = self._getAvailableServerID()
+        server_id = self._getAvailableServerID(STRATERGY)
         host,port = self._getLsockHostPortFromID(server_id)
         header = {
                 'host' : host,
