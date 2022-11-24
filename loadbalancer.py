@@ -52,10 +52,6 @@ def serverComm(key, mask):
     message = lb_msg.NameItYourself(key.fileobj)
     message.processTask()
 
-    
-
-
-        
 if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
@@ -81,9 +77,6 @@ if __name__ == "__main__":
     try:
         while True:
             events = sel.select(timeout = None)
-
-
-            # print(events)
             for key, mask in events:
                 if key.data is None:
                     # New client tried to connect
@@ -91,7 +84,6 @@ if __name__ == "__main__":
                 else:
                     # Server is sending a message
                     serverComm(key, mask)
-                    pass
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:

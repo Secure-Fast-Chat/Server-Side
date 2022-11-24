@@ -167,7 +167,7 @@ class Message:
         request = json_header["request"]
         if request == "login":
             # print("request is login")
-            self._process_login(json_header["username"], json_header["password"]) 
+            self._process_login(json_header["username"], json_header["password"])
             return 1
         content_len = json_header['content-length']
         if content_len:
@@ -435,9 +435,6 @@ class Message:
                 proto_header = struct.pack('>H', len(encoded_json_header))
                 self._data_to_send = proto_header + encoded_json_header + content
                 self._send_msg_to_reciever(self.lbsock)
-
-
-
 
     def _send_rcvr_key(self, rcvr_uid:str)->None:
         """Gets the public key of a given user
