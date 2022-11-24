@@ -126,7 +126,8 @@ class NameItYourself:
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
         if request == "user-logout":
             print("User went out")
-            del LOGGED_CLIENTS[json_header["uid"]]
+            if json_header["uid"] in LOGGED_CLIENTS.keys():
+                del LOGGED_CLIENTS[json_header["uid"]]
             pass
 
     def _send_data_to_client(self):

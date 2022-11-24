@@ -17,10 +17,17 @@ def accept(sel, sock):
     print(f"{sock=}")
     conn, addr = sock.accept()
     print(f"Connected by {addr}")
+    conn.setblocking(False)
+    events = selectors.EVENT_READ
+    sel.register(conn, events, data={"notDoneKeyEx":True})
+
+
+def doKeyex(sel, conn):
     global privatekey
     
     publickey = privatekey.public_key
     message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, sel, LOGGED_CLIENTS, LBSOCK)
+
 
     key = message.keyex()
     if key == -1:
@@ -30,12 +37,14 @@ def accept(sel, sock):
         return
 
     clientPublicKey = nacl.public.PublicKey(key, encoder=Base64Encoder)
-    print(f"Keys Exchanged. client public key = {clientPublicKey}")
-    print(f"My public key is {publickey}")
-    events = selectors.EVENT_READ
+    # print(f"Keys Exchanged. client public key = {clientPublicKey}")
+    # print(f"My public key is {publickey}")
+    
     box = Box(privatekey, clientPublicKey)
-    conn.setblocking(False)
+    sel.unregister(conn)
+    events = selectors.EVENT_READ
     sel.register(conn, events, data={"box":box})
+
     ##!!
     print("Accepted Client")
     ##!!
@@ -43,15 +52,18 @@ def accept(sel, sock):
 def service(key, mask, HOST, PORT):
     global LOGGED_CLIENTS
     sock = key.fileobj
-    print( "loadbalancer" in key.data.keys())
     if  "loadbalancer" in key.data.keys():
         # breakpoint()
         message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, False)
         message.processTask()
         return
+    
+    global sel
+    if "notDoneKeyEx" in key.data.keys():
+        doKeyex(sel, key.fileobj)
+        return
     # breakpoint()
     message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
-    global sel
     if message.processTask() != -1:
         uid, selKey, newLogin = message.get_uid_selKey()
         if uid != "":
@@ -115,7 +127,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     sel.register(lsock, selectors.EVENT_READ, data = None)
     try:
         while True:
-            print("Reached//")
+            # print("Reached//")
             events = sel.select(timeout = None)
             for key, mask in events:
                 print(key.data)
