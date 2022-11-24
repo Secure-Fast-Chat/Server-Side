@@ -15,7 +15,6 @@ SERVER_MAPPING = [
 LOGGED_CLIENTS = {} # username: (host, port)
 SERVER_SOCKETS = {} # index: socket
 ENCODING_USED = 'utf-8'
-STRATEGY = "random"
 # STRATERGY = "round-robin"
 NEXTSERVERID = 0 # Next server for round robin
 SERVER_COUNT = [0 for i in SERVER_MAPPING] # The count of the number of clients on a server
@@ -29,13 +28,14 @@ class LoadBalancerMessage:
     :type _msg_to_send: bytes
     """
 
-    def __init__(self,socket):
+    def __init__(self,socket, strategy="random"):
         """ Constructor object
 
         :param socket: Connection socket
         :type socket: socket.socket
         """
         self.socket = socket
+        self.strategy = strategy
 
     def _json_encode(self, obj, encoding = ENCODING_USED):
         """Function to encode dictionary to bytes object
@@ -49,18 +49,18 @@ class LoadBalancerMessage:
 
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
-    def _getAvailableServerID(self, stratergy):
+    def _getAvailableServerID(self, strategy):
         """ This function finds the server with least number of connections and returns the corresponding id.
 
         :return: The id of server to use
         :rtype: int
         """
 
-        if stratergy is "random":
+        if strategy is "random":
             return self._getRandomServer()
-        elif stratergy is "round-robin":
+        elif strategy is "round-robin":
             return self._getRoundRobinServer()
-        elif stratergy is "least-conn":
+        elif strategy is "least-conn":
             return self._getLeastConnServer()
 
     def _getLeastConnServer(self):
@@ -153,18 +153,18 @@ class LoadBalancerMessage:
                 serverId = SERVER_MAPPING.index(address)
                 serverSock = self._getSocketFromID(serverId) 
             else:
-                serverSock = self._getSocketFromID(self._getAvailableServerID())
+                serverSock = self._getSocketFromID(self._getAvailableServerID(self.strategy))
             self._prepareMessage(json_header, content)
             print(f"Sending {self._msg_to_send} to {serverSock}")
             serverSock.sendall(self._msg_to_send)
         if request == "new-login":
             print(f"New user logged in: {json_header['uid']}")
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
-            SERVER_COUNT[SERVER_MAPPING.getindex((json_header["host"], json_header["port"]))]+=1
+            SERVER_COUNT[SERVER_MAPPING.index((json_header["host"], json_header["port"]))]+=1
         if request == "user-logout":
             print("User went out")
             if json_header["uid"] in LOGGED_CLIENTS.keys():
-                SERVER_COUNT[SERVER_MAPPING.getindex(LOGGED_CLIENTS[json_header["uid"]])]-=1
+                SERVER_COUNT[SERVER_MAPPING.index(LOGGED_CLIENTS[json_header["uid"]])]-=1
                 del LOGGED_CLIENTS[json_header["uid"]]
             pass
 
@@ -179,7 +179,7 @@ class LoadBalancerMessage:
         """ Function to redirect client
 
         """
-        server_id = self._getAvailableServerID(STRATEGY)
+        server_id = self._getAvailableServerID(self.strategy)
         host,port = self._getLsockHostPortFromID(server_id)
         header = {
                 'host' : host,
