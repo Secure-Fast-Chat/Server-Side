@@ -9,6 +9,7 @@ import random
 import time
 import subprocess
 import atexit
+import argparse
 
 ENCODING_USED = "utf-8"
 LBHOST = "127.0.0.1"
@@ -49,7 +50,15 @@ def registerServer(addr: Tuple[str, int], index: int):
 
 def serverComm(key, mask):
     print(key.data)
-    message = lb_msg.LoadBalancerMessage(key.fileobj)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--strat', type=str)
+    args = parser.parse_args()
+    if args.strat:
+        strategy = args.strat
+        print(f"{strategy=}")
+    else:
+        strategy = "random"
+    message = lb_msg.LoadBalancerMessage(key.fileobj, strategy)
     message.processTask()
 
 if __name__ == "__main__":

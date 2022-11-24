@@ -162,7 +162,8 @@ class LoadBalancerMessage:
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
             SERVER_COUNT[SERVER_MAPPING.index((json_header["host"], json_header["port"]))]+=1
         if request == "user-logout":
-            print("User went out")
+            username = json_header["uid"]
+            print(f"{username} logged out")
             if json_header["uid"] in LOGGED_CLIENTS.keys():
                 SERVER_COUNT[SERVER_MAPPING.index(LOGGED_CLIENTS[json_header["uid"]])]-=1
                 del LOGGED_CLIENTS[json_header["uid"]]
