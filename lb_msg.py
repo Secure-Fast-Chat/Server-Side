@@ -72,7 +72,7 @@ class NameItYourself:
         :rtype: tuple(str,int)
         """
 
-        return SERVER_SOCKETS[self._getLsockHostPortFromID(server_id)]
+        return SERVER_SOCKETS[server_id]
 
     def _prepareMessage(self,json_header,content=b'', encrypt=True):
         """ Prepare the string to send from header and content and encrypt by default
@@ -108,16 +108,23 @@ class NameItYourself:
         json_header, content = self._readMessage()
         request = json_header["request"]
         if request == "pls-relay":
+            print("got a message to relay")
             receiver_username = json_header["receiver"]
             serverSock = None
             if receiver_username in LOGGED_CLIENTS.keys():
                 # Send a relay request to the corresponding server
-                serverSock = self._getLsockHostPortFromID(LOGGED_CLIENTS[receiver_username])
+                serverSock = LOGGED_CLIENTS[receiver_username] # TODO this line has error. Logged clients contains tuples of hostnam, port
             else:
                 serverSock = self._getSocketFromID(self._getAvailableServerID())
             self._prepareMessage(json_header, content)
+            print(f"Sending {self._msg_to_send} to {serverSock}")
             serverSock.sendall(self._msg_to_send)
         if request == "new-login":
+            print(f"New user logged in: {json_header['uid']}")
+            LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
+        if request == "user-logout":
+            print("User went out")
+            del LOGGED_CLIENTS[json_header["uid"]]
             pass
 
 

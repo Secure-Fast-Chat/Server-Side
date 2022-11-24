@@ -28,13 +28,15 @@ class Message:
     :type _recvd_msg: bytes
     """
 
-    def __init__(self,conn_socket,status,request,sel, loggedClients, lbsock):
+    def __init__(self,conn_socket,status,request,sel, loggedClients, lbsock, encrypt=True):
         """Constructor Object
 
         :param conn_socket: Socket which has a connection with client
         :type conn_socket: socket.socket
         :param request: Content to send to server
         :type request: str
+        :param encrypt: Whether the received data would be encrypted
+        :type exncrypt: bool, Optional, defaults to True
         """
         self.status = status
         self.socket = conn_socket
@@ -51,9 +53,11 @@ class Message:
         self.online = self.username != "" and self.username in self.logged_clients.keys()
         
         self.lbsock = lbsock
+        self.is_encrypted = encrypt
+        self.newLogin = False
 
     @classmethod 
-    def fromSelKey(cls, selectorKey, loggedClients, lbsock):
+    def fromSelKey(cls, selectorKey, loggedClients, lbsock, encrypt=True):
         """Custom constructor to initialise a message given just the selector key
 
         :param selectorKey: the selector key containitnall the data
@@ -65,7 +69,7 @@ class Message:
         request_content=""
         sel=selectorKey
         
-        return cls(socket, 0, request_content, sel, loggedClients, lbsock)
+        return cls(socket, 0, request_content, sel, loggedClients, lbsock, encrypt)
 
     def _send_data_to_client(self):
         """Function to send the string to the client. It sends content of _send_data_to_client to the client.
@@ -108,7 +112,7 @@ class Message:
                 return -1
             self._recvd_msg += data
         # print('hey there ',encrypted,self._recvd_msg)
-        if encrypted:
+        if encrypted and self.is_encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
         # print('ho',self._recvd_msg)
         return 1
@@ -174,13 +178,24 @@ class Message:
         ###################################################################
         ###################### ByteOrder Things ###########################
         ###################################################################
-        if(request == "send-msg" or request == "send-group-message"):
+        if(request == "send-msg" or request == "send-group-message" or request == "pls-relay"):
             content = content_obj
         else:
             content = content_obj.decode(ENCODING_USED)
         if(request == "signupuid"):
             # print("request is signupuid")
             self._process_signup_uid(content)
+        if request == "pls-relay":
+            print("Relaying")
+            receiver = json_header["receiver"]
+            msg_type = json_header["content-type"]
+            if "guid" in json_header.keys():
+                grp_uid = json_header["guid"]
+            else:
+                grp_uid = None
+            sender  =json_header["sender"]
+            timestamp  =json_header["timestamp"]
+            self._send_msg(receiver, msg_type, content, grp_uid, sender, timestamp, True)
         if(request == "signuppass"):
             # print("request is signuppass")
             content = json.loads(content)
@@ -214,19 +229,10 @@ class Message:
             self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
             self._send_group_key(json_header["group-name"], self.username)
-        if request == "pls-relay":
-            receiver = json_header["receiver"]
-            msg_type = json_header["content-type"]
-            if "guid" in json_header.keys():
-                grp_uid = json_header["guid"]
-            else:
-                grp_uid = None
-            sender  =json_header["sender"]
-            timestamp  =json_header["timestamp"]
-            self._send_msg(receiver, msg_type, content, grp_uid, sender, timestamp, True)
+        
 
         # print("Unknown request")
-        # print(request)
+        print(request)
         return 1
 
     def _rem_grp_mem(self, grp_uid, uid):
@@ -363,6 +369,7 @@ class Message:
         :param save: whether to save if the receiver is not directly connected to the server
         :type save: bool
         """
+        print("I am message")
         if(sender is None):
             if not grp_uid:
                 sender = self.username
@@ -408,9 +415,9 @@ class Message:
                 print("Storing message")
                 # breakpoint()
                 storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
+                print("Storing to db")
             else:
                 # send this data to load balancer
-                content = box.encrypt(content)
                 jsonheader = {
                     "byteorder": sys.byteorder,
                     "request": "pls-relay",
@@ -505,8 +512,9 @@ class Message:
                 self.sel.data["username"] = username
                 self.username = username
                 self._send_data_to_client()
+                self.newLogin = True                    
                 self.logged_clients[self.username] = self.sel
-                self._send_successful_login_info_to_lb()
+                # self._send_successful_login_info_to_lb()
                 # (SENDER, RECEIVER, MESSAGE, TIMESTAMP, CONTENTTYPE)
                 unsent_messages = getUnsentMessages(self.username)
                 count = 0
@@ -517,7 +525,6 @@ class Message:
                     if("::" in sender):
                         guid = sender[0:sender.find("::")]
                     self._send_msg(rcvr, msgtype, messg, grp_uid = guid, sender = sender,timestamp = timestamp)
-                # TODO: Send unread messages to user
 
             else:
                 self._data_to_send = self._login_failed()
@@ -678,10 +685,10 @@ class Message:
         else:
             return False
 
-    def get_uid_selKey(self)-> Tuple[str, selectors.SelectorKey]:
+    def get_uid_selKey(self)-> Tuple[str, selectors.SelectorKey, bool]:
         """Helper function to get the username and selectorkey
 
-        :return: A tuples containing the username and selectorkey
-        :rtype: tuple[str, selectors.SelectorKey]
+        :return: A tuples containing the username and selectorkey and whether this message led to a new login
+        :rtype: tuple[str, selectors.SelectorKey, bool]
         """
-        return (self.username, self.sel)
+        return (self.username, self.sel, self.newLogin)
