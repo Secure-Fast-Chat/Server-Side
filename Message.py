@@ -100,6 +100,8 @@ class Message:
         :rtype: int
         """
 
+        if size == 0:
+            return
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
             # print("hi,can you find bug")
@@ -155,6 +157,8 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
+
+        print("ME IS CALLED NOWNOW NOW")
         if self._recv_data_from_client(2, False) != 1 or self._recvd_msg == b'':
             # print("Connection closed")
             return -1 # Connection closed
@@ -229,11 +233,36 @@ class Message:
             self._send_grp_message(grp_uid, msg_type, content)
         if request == "grp-key":
             self._send_group_key(json_header["group-name"], self.username)
+        if request == 'leave-grp':
+            self._handle_leave_group_request(json_header['guid'],self.username)
         
 
         # print("Unknown request")
         print(request)
         return 1
+
+    def _handle_leave_group_request(self,grp_uid,uid):
+        """ Function to remove member from group based on leave request
+
+        :param guid: Group to remove from
+        :type guid: str
+        :param uid: user to remove
+        :type uid: str
+        """
+
+        response = 0
+        grp_uid_exists = not checkIfGroupNameFree(grp_uid)
+        if(not grp_uid_exists):
+            response = 1 # Group does not exist
+        else:
+            userList = getGroupMembers(grp_uid)
+            if(uid not in userList):
+                response = 1
+            else:
+                removeGroupMember(grp_uid, uid)
+                response = 0
+        self._data_to_send = struct.pack('>H',response)
+        self._send_data_to_client()
 
     def _rem_grp_mem(self, grp_uid, uid):
         response = 0
