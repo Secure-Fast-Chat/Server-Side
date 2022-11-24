@@ -164,8 +164,9 @@ class NameItYourself:
             SERVER_COUNT[SERVER_MAPPING.getindex((json_header["host"], json_header["port"]))]+=1
         if request == "user-logout":
             print("User went out")
-            del LOGGED_CLIENTS[json_header["uid"]]
-            SERVER_COUNT[SERVER_MAPPING.getindex(LOGGED_CLIENTS[json_header["uid"]])]-=1
+            if json_header["uid"] in LOGGED_CLIENTS.keys():
+                SERVER_COUNT[SERVER_MAPPING.getindex(LOGGED_CLIENTS[json_header["uid"]])]-=1
+                del LOGGED_CLIENTS[json_header["uid"]]
             pass
 
     def _send_data_to_client(self):

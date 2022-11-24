@@ -62,7 +62,7 @@ if __name__ == "__main__":
     privateKey = PrivateKey.generate()
     for j in range(len(serverAddrs)):
         i = serverAddrs[j]
-        myoutput = open('serveroutputs.txt', 'w')
+        myoutput = open(f'serveroutputs{i}.txt', 'w')
         command = f"python startServer.py {i[0]} {i[1]}"
         process = subprocess.Popen(command.split(), stdout=1, stderr=2)
         atexit.register(process.kill)

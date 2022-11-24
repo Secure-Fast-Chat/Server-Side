@@ -8,6 +8,7 @@ from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE
 import datetime
 import re
 from typing import Tuple
+import time
 # import loadbalancer
 # import startServer
 
@@ -105,10 +106,13 @@ class Message:
         self._recvd_msg = b''
         while len(self._recvd_msg) < size:
             # print("hi,can you find bug")
-            try:
-                data = self.socket.recv(size-len(self._recvd_msg))
-            except BlockingIOError:
-                return -1
+            # try:
+            data = self.socket.recv(size-len(self._recvd_msg))
+            # except BlockingIOError:
+            # Note: We don't need this if we do things properly, which we now are
+            #     time.sleep(0.1) 
+            #     data = self.socket.recv(size-len(self._recvd_msg)) 
+                # return -1
             if not data:
                 print(f"close connection to {self.socket}")
                 return -1
@@ -158,7 +162,7 @@ class Message:
         :rtype: int
         """
 
-        print("ME IS CALLED NOWNOW NOW")
+        # print("ME IS CALLED NOWNOW NOW")
         if self._recv_data_from_client(2, False) != 1 or self._recvd_msg == b'':
             # print("Connection closed")
             return -1 # Connection closed
@@ -517,6 +521,8 @@ class Message:
         self._data_to_send = proto_header + encoded_json_header # Not sending any content since the data is in the header
         self._send_data_to_client()
         return clientPublicKey
+
+    
  
     def _process_login(self, username, password):
         """Processes Login Request
