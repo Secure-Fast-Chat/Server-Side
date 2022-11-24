@@ -58,3 +58,5 @@ clientvenv/*
 
 __pycache__/*
 *.pyc
+
+serveroutputs*.txt
