@@ -175,7 +175,10 @@ class Message:
             return 1
         content_len = json_header['content-length']
         if content_len:
-            self._recv_data_from_client(content_len)
+            if request == 'send-msg':
+                self._recv_data_from_client(content_len,encrypted=False)
+            else:
+                self._recv_data_from_client(content_len)
         content_obj = self._recvd_msg
         
         
