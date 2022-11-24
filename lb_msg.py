@@ -15,12 +15,12 @@ SERVER_MAPPING = [
 LOGGED_CLIENTS = {} # username: (host, port)
 SERVER_SOCKETS = {} # index: socket
 ENCODING_USED = 'utf-8'
-STRATERGY = "random"
+STRATEGY = "random"
 # STRATERGY = "round-robin"
-NEXTSERVERID = 0
-SERVER_COUNT = [0 for i in SERVER_MAPPING]
+NEXTSERVERID = 0 # Next server for round robin
+SERVER_COUNT = [0 for i in SERVER_MAPPING] # The count of the number of clients on a server
 
-class NameItYourself:
+class LoadBalancerMessage:
     """ Class for conversation over sockets
 
     :param socket: Connection Socket to talk on
@@ -86,7 +86,6 @@ class NameItYourself:
         :return: server id
         :rtype: int"""
         server = random.randint(0, len(SERVER_MAPPING)-1)
-        print(f'Redirecting to server {server}')
         return server
 
     def _getLsockHostPortFromID(self,server_id):
@@ -180,7 +179,7 @@ class NameItYourself:
         """ Function to redirect client
 
         """
-        server_id = self._getAvailableServerID(STRATERGY)
+        server_id = self._getAvailableServerID(STRATEGY)
         host,port = self._getLsockHostPortFromID(server_id)
         header = {
                 'host' : host,

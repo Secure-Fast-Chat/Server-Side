@@ -22,7 +22,7 @@ def accept(sel, sock):
     conn, addr = sock.accept()
     # print(f"Connected by {addr}")
     
-    lb_msg.NameItYourself(conn).processClient()
+    lb_msg.LoadBalancerMessage(conn).processClient()
 
     # sock.close()
     # print("Connection Closed")
@@ -49,7 +49,7 @@ def registerServer(addr: Tuple[str, int], index: int):
 
 def serverComm(key, mask):
     print(key.data)
-    message = lb_msg.NameItYourself(key.fileobj)
+    message = lb_msg.LoadBalancerMessage(key.fileobj)
     message.processTask()
 
 if __name__ == "__main__":
