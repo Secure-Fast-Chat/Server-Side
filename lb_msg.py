@@ -129,10 +129,6 @@ class NameItYourself:
             del LOGGED_CLIENTS[json_header["uid"]]
             pass
 
-
-
-
-
     def _send_data_to_client(self):
         """ Sends the content of _msg_to_send through the socket
 

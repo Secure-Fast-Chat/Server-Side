@@ -56,6 +56,9 @@ if __name__ == "__main__":
     global sel
     sel = selectors.DefaultSelector()
 
+    lb_msg.SERVER_MAPPING = eval(input('Server-mapping list in proper format'))
+    serverAddrs = lb_msg.SERVER_MAPPING
+
     privateKey = PrivateKey.generate()
     for j in range(len(serverAddrs)):
         i = serverAddrs[j]
