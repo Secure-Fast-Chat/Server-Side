@@ -64,7 +64,7 @@ if __name__ == "__main__":
         i = serverAddrs[j]
         myoutput = open('serveroutputs.txt', 'w')
         command = f"python startServer.py {i[0]} {i[1]}"
-        process = subprocess.Popen(command.split(), stdout=myoutput, stderr=myoutput)
+        process = subprocess.Popen(command.split(), stdout=1, stderr=2)
         atexit.register(process.kill)
         time.sleep(0.2)
         registerServer(i, j)
