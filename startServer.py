@@ -43,7 +43,7 @@ def doKeyex(sel, conn, key):
     
     box = Box(privatekey, clientPublicKey)
     sel.unregister(conn)
-    events = selectors.EVENT_READ
+    events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data={"box":box})
 
     ##!!
