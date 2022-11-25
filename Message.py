@@ -225,7 +225,7 @@ class Message:
             self._process_login(json_header["username"], json_header["password"])
             return 1
         content_len = json_header['content-length']
-        if self._content == "":
+        if self._content == None:
             if content_len:
                 if request == 'send-msg':
 
