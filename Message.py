@@ -121,7 +121,10 @@ class Message:
 
         if size == 0:
             return
-        data = self.socket.recv(size-len(self._recvd_msg))
+        try:
+            data = self.socket.recv(size-len(self._recvd_msg))
+        except ConnectionResetError:
+            return -1    
         if not data:
             print(f"close connection to {self.socket}")
             return -1
