@@ -312,7 +312,7 @@ def deleteIndividualMessage(sender:str, receiver:str,content:bytes):
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        DELETE FROM {messages_table_name} WHERE RECEIVER = '{receiver}' and SENDER ='{sender}' and MESSAGE = '{content}'
+        DELETE FROM {messages_table_name} WHERE RECEIVER = '{receiver}' and SENDER ='{sender}' and MESSAGE = '{content.decode('utf-8')}'
     ''')
     conn.commit()
     conn.close()
@@ -328,7 +328,7 @@ def deleteGroupMessage(sender:str, content:bytes):
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''
-        DELETE FROM {messages_table_name} WHERE SENDER ='{sender}' and MESSAGE = '{content}'
+        DELETE FROM {messages_table_name} WHERE SENDER ='{sender}' and MESSAGE = '{content.decode('utf-8')}'
     ''')
     conn.commit()
     conn.close()
