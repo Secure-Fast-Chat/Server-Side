@@ -55,7 +55,10 @@ def service(key, mask, HOST, PORT):
         sock = key.fileobj
         if  "loadbalancer" in key.data.keys():
             # breakpoint()
-            message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, False)
+            if (not "left" in key.data.keys()) or key.data["left"] == 0:
+                message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+            else:
+                message = key.data["message"]
             message.processTask()
             return
         
@@ -86,7 +89,7 @@ def service(key, mask, HOST, PORT):
                 send_lb_logout_info(uid)
     elif mask & selectors.EVENT_WRITE:
         if "to_send" in key.data.keys():
-            n = key.fileobj.send(to_send)
+            n = key.fileobj.send(key.data["to_send"])
             key.data['to_send'] = key.data['to_send'][n:]
             if len(key.data['to_send']) == 0:
                 del key.data['to_send']
