@@ -29,7 +29,7 @@ class Message:
     :type _recvd_msg: bytes
     """
 
-    def __init__(self,conn_socket,status,request,sel, loggedClients, lbsock, encrypt=True):
+    def __init__(self,conn_socket,status,request,sel, loggedClients, lbsock, selector, encrypt=True):
         """Constructor Object
 
         :param conn_socket: Socket which has a connection with client
@@ -47,9 +47,9 @@ class Message:
         self.logged_clients = loggedClients
         self.username = ""
         self._recvd_msg = b''
-        self._proto_header = ""
-        self._header = ""
-        self._content = ""
+        self._proto_header = None
+        self._header = None
+        self._content = None
         try:
             # breakpoint()
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
@@ -60,10 +60,11 @@ class Message:
         self.lbsock = lbsock
         self.is_encrypted = encrypt
         self.newLogin = False
+        self.selector = selector
         
 
     @classmethod 
-    def fromSelKey(cls, selectorKey, loggedClients, lbsock, encrypt=True):
+    def fromSelKey(cls, selectorKey, loggedClients, lbsock, selector, encrypt=True):
         """Custom constructor to initialise a message given just the selector key
 
         :param selectorKey: the selector key containitnall the data
@@ -75,14 +76,14 @@ class Message:
         request_content=""
         sel=selectorKey
         
-        return cls(socket, 0, request_content, sel, loggedClients, lbsock, encrypt)
+        return cls(socket, 0, request_content, sel, loggedClients, lbsock,selector, encrypt)
 
     def _send_data_to_client(self):
         """Function to send the string to the client. It sends content of _send_data_to_client to the client.
         """
         # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
-        self.socket.sendall(left_message)
+        self.sel.data["to_send"] += left_message
         return
 
     def encrypt(self, data: bytes)->bytes:
@@ -129,9 +130,11 @@ class Message:
         :param rcvr_sock: The socket to which to send
         :type rcvr_sock: Socket
         """
-        while(len(self._data_to_send) > 0):
-            ns = rcvr_sock.send(self._data_to_send)
-            self._data_to_send = self._data_to_send[ns:]
+        receiverSelKey = self.sel.get_key(rcvr_sock)
+        receiverSelKey.data["to-send"] +=self._data_to_send 
+        # while(len(self._data_to_send) > 0):
+        #     ns = rcvr_sock.send(self._data_to_send)
+        #     self._data_to_send = self._data_to_send[ns:]
 
     def _json_encode(self, obj, encoding):
         """Function to encode dictionary to bytes object
@@ -163,11 +166,11 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-        if self._proto_header == "":
+        if self._proto_header == None:
             errorCode = self._recv_data_from_client(2, False)
             # print("ME IS CALLED NOWNOW NOW")
-            if errorCode == -1 or self._recvd_msg == b'':
-                # print("Connection closed")
+            if errorCode == -1:
+                print("Connection closed")
                 return -1 # Connection closed
             elif errorCode == -2:
                 return -2
@@ -175,14 +178,15 @@ class Message:
             json_header_length = struct.unpack('>H', packed_proto_header)[0]
             self._proto_header = packed_proto_header
             self._recvd_msg = b""
+           # return -2
         else:
             packed_proto_header = self._proto_header
             json_header_length = struct.unpack('>H', packed_proto_header)[0]
 
-        if self._header == "":
+        if self._header == None:
             errorCode = self._recv_data_from_client(json_header_length)
-            if errorCode == -1 or self._recvd_msg == b'':
-                # print("Connection closed")
+            if errorCode == -1:
+                print("Connection closed")
                 return -1 # Connection closed
             elif errorCode == -2:
                 return -2
@@ -191,6 +195,7 @@ class Message:
             json_header = json.loads(obj.decode(ENCODING_USED))
             self._header = json_header
             self._recvd_msg = b""
+            
         else:
             json_header = self._header
 
@@ -208,7 +213,7 @@ class Message:
                 else:
                     errorCode = self._recv_data_from_client(content_len)
             
-            if errorCode == -1 or self._recvd_msg == b'':
+            if errorCode == -1:
                 # print("Connection closed")
                 return -1 # Connection closed
             elif errorCode == -2:
@@ -531,10 +536,10 @@ class Message:
         :rtype: str
         """
 
-        if self._proto_header == "":
+        if self._proto_header == None:
             errorCode = self._recv_data_from_client(2, False)
             # print("ME IS CALLED NOWNOW NOW")
-            if errorCode == -1 or self._recvd_msg == b'':
+            if errorCode == -1:
                 # print("Connection closed")
                 return -1 # Connection closed
             elif errorCode == -2:
@@ -547,9 +552,9 @@ class Message:
             packed_proto_header = self._proto_header
             json_header_length = struct.unpack('>H', packed_proto_header)[0]
 
-        if self._header == "":
-            errorCode = self._recv_data_from_client(json_header_length)
-            if errorCode == -1 or self._recvd_msg == b'':
+        if self._header == None:
+            errorCode = self._recv_data_from_client(json_header_length, False)
+            if errorCode == -1:
                 # print("Connection closed")
                 return -1 # Connection closed
             elif errorCode == -2:

@@ -23,11 +23,11 @@ def accept(sel, sock):
     sel.register(conn, events, data={"notDoneKeyEx":True})
 
 
-def doKeyex(sel, conn):
+def doKeyex(sel, conn, key):
     global privatekey
     
     publickey = privatekey.public_key
-    message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, sel, LOGGED_CLIENTS, LBSOCK)
+    message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, key, LOGGED_CLIENTS, LBSOCK, sel)
 
 
     key = message.keyex()
@@ -52,24 +52,25 @@ def doKeyex(sel, conn):
 
 def service(key, mask, HOST, PORT):
     if mask & selectors.EVENT_READ:
+        global sel
         global LOGGED_CLIENTS
         sock = key.fileobj
         if  "loadbalancer" in key.data.keys():
             # breakpoint()
             if (not "left" in key.data.keys()) or key.data["left"] == 0:
-                message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+                message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, sel)
             else:
                 message = key.data["message"]
             message.processTask()
             return
         
-        global sel
         if "notDoneKeyEx" in key.data.keys():
-            doKeyex(sel, key.fileobj)
+            doKeyex(sel, key.fileobj, key)
+            del key.data["notDoneKeyEx"]
             return
         # breakpoint()
         if (not "left" in key.data.keys()) or key.data["left"] == 0:
-            message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+            message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, sel)
         else:
             message = key.data["message"]
         if message.processTask() != -1:
@@ -85,6 +86,8 @@ def service(key, mask, HOST, PORT):
                     # Only send if we didnt have the user connected already
                 LOGGED_CLIENTS[uid] = selKey
         else:
+            print("Logging out")
+            
             uid, selKey, newLogin = message.get_uid_selKey()
             sock = selKey.fileobj
             sel.unregister(sock)
