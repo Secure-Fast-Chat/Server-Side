@@ -36,6 +36,13 @@ serverSockets = lb_msg.SERVER_SOCKETS
 
 
 def registerServer(addr: Tuple[str, int], index: int):
+    """Registers a server with listening socket of the load balancer
+    
+    :param addr: tuple of host, port
+    :type addr: Tuple[str, int]
+    :param index: index of the server
+    :type index: int"""
+
     print("Registering server")
     global sel
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,6 +56,11 @@ def registerServer(addr: Tuple[str, int], index: int):
 
 
 def serverComm(key, mask):
+    """Process the communication between server and loadbalancer
+    
+    :param key: server key
+    :type key: selector key
+    """
     # print(key.data)
     parser = argparse.ArgumentParser()
     parser.add_argument('--strat', type=str)

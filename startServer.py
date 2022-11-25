@@ -23,6 +23,7 @@ def accept(sel, sock):
 
 
 def doKeyex(sel, conn):
+    
     global privatekey
     
     publickey = privatekey.public_key
@@ -91,6 +92,10 @@ def service(key, mask, HOST, PORT):
 
 
 def send_lb_logout_info(uid):
+    """Tells the ;pad balancer about which user has logged out
+    
+    :param uid: user id of the user that has logged out,
+    :type uid: str"""
     json_header = {
         "byteorder": sys.byteorder,
         "request": "user-logout",
@@ -101,6 +106,14 @@ def send_lb_logout_info(uid):
     LBSOCK.sendall(struct.pack('>H', len(json_header)) + json_header)
 
 def send_lb_new_login_info(uid, HOST, PORT):
+    """Tells the load balancer about which user has logged in
+    
+    :param uid: User id of the user that has logged in,
+    :type uid: str,
+    :param HOST: host of the load balancer,
+    :type HOST: str,
+    :param PORT: port of the load balancer,
+    :type PORT: int"""
     json_header = {
         "byteorder": sys.byteorder,
         "request": "new-login",
@@ -113,6 +126,15 @@ def send_lb_new_login_info(uid, HOST, PORT):
     LBSOCK.sendall(struct.pack('>H', len(json_header)) + json_header)
 
 def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
+    """Server starts and connects to the socket of the load balancer
+    
+    :param pvtKey: private key of the server,
+    :type pvtKey: nacl.public.PrivateKey,
+    :param HOST: host of the loadbalancer,
+    :type HOST: str,
+    :param PORT: port of the loadbalancer,
+    :type PORT: int
+    """
     global privatekey
     privatekey = pvtKey
     global sel

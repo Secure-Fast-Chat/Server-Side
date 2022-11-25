@@ -275,6 +275,12 @@ class Message:
         self._send_data_to_client()
 
     def _rem_grp_mem(self, grp_uid, uid):
+        """Removes a member from group, checking the validity of group id, user id and connecting with the database
+        
+        :param grp_uid: group id,
+        :type grp_uid: str,
+        :param uid: user id,
+        :type uid: str"""
         response = 0
         grp_uid_exists = not checkIfGroupNameFree(grp_uid)
         if(not grp_uid_exists):
