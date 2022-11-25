@@ -152,8 +152,8 @@ class LoadBalancerMessage:
                 self._json_header = json.loads(self._recvd_data.decode(ENCODING_USED))
                 self._recvd_data = b''
         if not self._content:
-            self._recvd_data += self.socket.recv(header['content-length']-len(self._recvd_data))
-            if len(self._recvd_data) < header['content-length']:
+            self._recvd_data += self.socket.recv(self._json_header['content-length']-len(self._recvd_data))
+            if len(self._recvd_data) < self._json_header['content-length']:
                 return 1
             self._content = self._recvd_data
             self.processTask()
