@@ -49,17 +49,36 @@ def registerServer(addr: Tuple[str, int], index: int):
 
 
 def serverComm(key, mask):
-    # print(key.data)
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--strat', type=str)
-    args = parser.parse_args()
-    if args.strat:
-        strategy = args.strat
-    else:
-        strategy = "random"
-    print(f"{strategy=}")
-    message = lb_msg.LoadBalancerMessage(key.fileobj, strategy)
-    message.processTask()
+    if mask & selectors.EVENT_READ:
+        # print(key.data)
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--strat', type=str)
+        args = parser.parse_args()
+        if args.strat:
+            strategy = args.strat
+        else:
+            strategy = "random"
+        print(f"{strategy=}")
+        if 'message' in key.data.keys():
+            status = key.data['message'].readFromSocket()
+            if status == 1:
+                return
+            elif status == 0:
+                del key.data['message']
+        else:
+            global sel
+            message = lb_msg.LoadBalancerMessage(key.fileobj, strategy,sel)
+            response = message.readFromSocket()
+            if response == 0:
+                return
+            elif response == 1:
+                key.data['message'] = message
+    elif mask & selectors.EVENT_WRITE:
+        if "to_send" in key.data.keys():
+            n = key.fileobj.send(key.data["to_send"])
+            key.data['to_send'] = key.data['to_send'][n:]
+            if len(key.data['to_send']) == 0:
+                del key.data['to_send']
 
 if __name__ == "__main__":
     global sel
@@ -85,7 +104,7 @@ if __name__ == "__main__":
     lsock.listen()
     lsock.setblocking(False)
     
-    sel.register(lsock, selectors.EVENT_READ, data = None)
+    sel.register(lsock, selectors.EVENT_READ | selectors.EVENT_WRITE, data = None)
     try:
         while True:
             events = sel.select(timeout = None)
