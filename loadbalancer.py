@@ -70,7 +70,7 @@ def serverComm(key, mask):
             strategy = args.strat
         else:
             strategy = "random"
-        print(f"{strategy=}")
+        # print(f"{strategy=}")
         if 'message' in key.data.keys():
             status = key.data['message'].readFromSocket()
             if status == 1:
