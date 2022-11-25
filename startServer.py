@@ -50,7 +50,7 @@ def doKeyex(sel, conn):
     print("Accepted Client")
     ##!!
 
-def service(key, mask, HOST, PORT,sel):
+def service(key, mask, HOST, PORT):
     if mask & selectors.EVENT_READ:
         global LOGGED_CLIENTS
         sock = key.fileobj
@@ -151,7 +151,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
-                    service(key, mask, HOST, PORT,sel)
+                    service(key, mask, HOST, PORT)
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:
