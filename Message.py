@@ -215,7 +215,7 @@ class Message:
         if not self.online:
             return 1
         if(request == "get-key"):
-            print(content)
+            # print(content)
             self._send_rcvr_key(json_header["recvr-username"]) # Get the public key of a given user
         if(request == "send-msg"):
             rcvr_uid = json_header["rcvr-uid"]
@@ -245,7 +245,7 @@ class Message:
         
 
         # print("Unknown request")
-        print(request)
+        # print(request)
         return 1
 
     def _handle_leave_group_request(self,grp_uid,uid):
@@ -405,7 +405,7 @@ class Message:
         :param save: whether to save if the receiver is not directly connected to the server
         :type save: bool
         """
-        print("I am message")
+        # print("I am message")
         if(sender is None):
             if not grp_uid:
                 sender = self.username
@@ -451,7 +451,7 @@ class Message:
                 print("Storing message")
                 # breakpoint()
                 storeMessageInDb(sender, rcvr_uid, content, timestamp, msg_type)
-                print("Storing to db")
+                # print("Storing to db")
             else:
                 # send this data to load balancer
                 jsonheader = {
