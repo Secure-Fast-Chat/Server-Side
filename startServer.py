@@ -67,7 +67,8 @@ def service(key, mask, HOST, PORT):
             message.processTask()
             return
         
-        if "notDoneKeyEx" in key.data.keys():
+        if "notDoneKeyEx" in key.data.keys() and key.data["notDoneKeyEx"] == True:
+            
             doKeyex(key.fileobj, key)
             del key.data["notDoneKeyEx"]
             return

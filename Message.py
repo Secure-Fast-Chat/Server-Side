@@ -140,7 +140,7 @@ class Message:
         :param rcvr_sock: The socket to which to send
         :type rcvr_sock: Socket
         """
-        receiverSelKey = self.sel.get_key(rcvr_sock)
+        receiverSelKey = self.selector.get_key(rcvr_sock)
         if 'to_send' not in receiverSelKey.data.keys():
             receiverSelKey['to_send'] = b''
         receiverSelKey.data["to_send"] +=self._data_to_send 
@@ -217,7 +217,7 @@ class Message:
             self._process_login(json_header["username"], json_header["password"])
             return 1
         content_len = json_header['content-length']
-        if self._content == "":
+        if self._content == None:
             if content_len:
                 if request == 'send-msg':
 
