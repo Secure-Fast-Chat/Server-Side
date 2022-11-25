@@ -142,7 +142,7 @@ class Message:
         """
         receiverSelKey = self.selector.get_key(rcvr_sock)
         if 'to_send' not in receiverSelKey.data.keys():
-            receiverSelKey['to_send'] = b''
+            receiverSelKey.data['to_send'] = b''
         receiverSelKey.data["to_send"] +=self._data_to_send 
         # while(len(self._data_to_send) > 0):
         #     ns = rcvr_sock.send(self._data_to_send)
