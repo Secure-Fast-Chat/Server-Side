@@ -84,11 +84,16 @@ class Message:
         # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
         # breakpoint()
-        ownSelKey = self.selector.get_key(self.socket)
-        if 'to_send' not in ownSelKey.data.keys():
-            ownSelKey.data['to_send'] = b''
-        ownSelKey.data["to_send"] += left_message
-        ownSelKey.data["notDoneKeyEx"] = False
+        # ownSelKey = self.selector.get_key(self.socket)
+        # try:
+        #     n = self.socket.send(self._data_to_send)
+        #     self._data_to_send = self._data_to_send[n:]
+        # except BlockingIOError:
+        if 'to_send' not in self.sel.data.keys():
+            self.sel.data['to_send'] = b''
+        self.sel.data["to_send"] += left_message
+        self.sel.data["notDoneKeyEx"] = False
+        self.selector.modify(self.socket,selectors.EVENT_READ | selectors.EVENT_WRITE,self.sel.data)
         return
 
     def encrypt(self, data: bytes)->bytes:
