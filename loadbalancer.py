@@ -19,7 +19,7 @@ def accept(sel, sock):
     """Function to accept a new client connection
     """
 
-    print(f"{sock}")
+    # print(f"{sock}")
     conn, addr = sock.accept()
     # print(f"Connected by {addr}")
     
@@ -43,7 +43,7 @@ def registerServer(addr: Tuple[str, int], index: int):
     sock.setblocking(False)
     events = selectors.EVENT_READ
     sel.register(sock, events, data={addr})
-    print(addr)
+    # print(addr)
     global serverSockets
     serverSockets[index] = sock
 
@@ -55,9 +55,9 @@ def serverComm(key, mask):
     args = parser.parse_args()
     if args.strat:
         strategy = args.strat
-        print(f"{strategy=}")
     else:
         strategy = "random"
+    print(f"{strategy=}")
     message = lb_msg.LoadBalancerMessage(key.fileobj, strategy)
     message.processTask()
 

@@ -127,7 +127,9 @@ class Message:
         :param rcvr_sock: The socket to which to send
         :type rcvr_sock: Socket
         """
-        rcvr_sock.sendall(self._data_to_send)
+        while(len(self._data_to_send) > 0):
+            ns = rcvr_sock.send(self._data_to_send)
+            self._data_to_send = self._data_to_send[ns:]
 
     def _json_encode(self, obj, encoding):
         """Function to encode dictionary to bytes object
