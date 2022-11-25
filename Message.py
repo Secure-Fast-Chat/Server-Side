@@ -146,7 +146,7 @@ class Message:
         :type rcvr_sock: Socket
         """
         try:
-            n = self.socket.send(self._data_to_send)
+            n = rcvr_sock.send(self._data_to_send)
             self._data_to_send = self._data_to_send[n:]
         except BlockingIOError:
             pass
