@@ -181,7 +181,8 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
             events = sel.select(timeout = None)
             for key, mask in events:
                 if key.fileobj != LBSOCK:
-                    print('START',key.data,mask)
+                    # print('START',key.data,mask)
+                    pass
                 # print(key.data)
                 if key.data is None:
                     accept(sel, key.fileobj)

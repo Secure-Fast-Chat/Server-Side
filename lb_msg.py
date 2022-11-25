@@ -45,6 +45,7 @@ class LoadBalancerMessage:
         self._content = None
         self._proto_header = None
         self._recvd_data = b''
+        self._data_to_send = b""
 
     def _json_encode(self, obj, encoding = ENCODING_USED):
         """Function to encode dictionary to bytes object
@@ -175,19 +176,19 @@ class LoadBalancerMessage:
             serverSock = None
             if receiver_username in LOGGED_CLIENTS.keys():
                 # Send a relay request to the corresponding server
-                address = LOGGED_CLIENTS[receiver_username] # TODO this line has error. Logged clients contains tuples of hostname, port
+                address = LOGGED_CLIENTS[receiver_username] 
                 serverId = SERVER_MAPPING.index(address)
                 serverSock = self._getSocketFromID(serverId) 
             else:
                 serverSock = self._getSocketFromID(self._getAvailableServerID(self.strategy))
             self._prepareMessage(json_header, content)
             # print(f"Sending {self._msg_to_send} to {serverSock}")
-            server_key = sel.get_key(serverSock)
+            server_key = self.sel.get_key(serverSock)
             if 'to_send' not in server_key.data.keys():
                 server_key.data['to_send'] = b''
             server_key.data['to_send'] += self._data_to_send
         if request == "new-login":
-            print(f"New user logged in: {json_header['uid']}")
+            print(f"Load balancer New user logged in: {json_header['uid']}")
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
             SERVER_COUNT[SERVER_MAPPING.index((json_header["host"], json_header["port"]))]+=1
         if request == "user-logout":
