@@ -49,7 +49,7 @@ def registerServer(addr: Tuple[str, int], index: int):
 
 
 def serverComm(key, mask):
-    print(key.data)
+    # print(key.data)
     parser = argparse.ArgumentParser()
     parser.add_argument('--strat', type=str)
     args = parser.parse_args()

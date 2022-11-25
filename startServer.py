@@ -31,7 +31,7 @@ def doKeyex(sel, conn):
 
     key = message.keyex()
     if key == -1:
-        print("closing keyex")
+        # print("closing keyex")
         # sel.unregister(sock)
         conn.close()
         return
@@ -67,7 +67,7 @@ def service(key, mask, HOST, PORT):
     if message.processTask() != -1:
         uid, selKey, newLogin = message.get_uid_selKey()
         if uid != "":
-            print(LOGGED_CLIENTS)
+            print(len(LOGGED_CLIENTS.keys()))
             if newLogin:
                 send_lb_new_login_info(uid, HOST, PORT)
                 # Only send if we didnt have the user connected already
