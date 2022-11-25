@@ -23,12 +23,12 @@ def accept(sel, sock):
     sel.register(conn, events, data={"notDoneKeyEx":True})
 
 
-def doKeyex(conn, key):
+def doKeyex(conn, selkey):
     global sel
     global privatekey
 
     publickey = privatekey.public_key
-    message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, key, LOGGED_CLIENTS, LBSOCK, sel)
+    message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, selkey, LOGGED_CLIENTS, LBSOCK, sel)
 
 
     key = message.keyex()
@@ -43,9 +43,11 @@ def doKeyex(conn, key):
     # print(f"My public key is {publickey}")
     
     box = Box(privatekey, clientPublicKey)
+    newdata = selkey.data
+    newdata["box"] = box
     sel.unregister(conn)
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    sel.register(conn, events, data={"box":box})
+    sel.register(conn, events, data=newdata)
 
     ##!!
     print("Accepted Client")
@@ -80,7 +82,7 @@ def service(key, mask, HOST, PORT):
                 print(len(LOGGED_CLIENTS.keys()))
                 if newLogin:
                     content = send_lb_new_login_info(uid, HOST, PORT)
-                    key_lb = sel.get_key(LB_SOCK)
+                    key_lb = sel.get_key(LBSOCK)
                     if 'to_send' not in key_lb.data.keys():
                         key_lb.data['to_send'] = b''
                     key_lb.data['to_send'] += content
@@ -96,7 +98,7 @@ def service(key, mask, HOST, PORT):
             if(uid!=""):
                 del LOGGED_CLIENTS[uid]
                 content = send_lb_logout_info(uid)
-                key_lb = sel.get_key(LB_SOCK)
+                key_lb = sel.get_key(LBSOCK)
                 if 'to_send' not in key_lb.data.keys():
                     key_lb.data['to_send'] = b''
                 key_lb.data['to_send'] += content
@@ -157,7 +159,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
             events = sel.select(timeout = None)
             for key, mask in events:
                 if key.fileobj != LBSOCK:
-                    print('START',key,mask)
+                    print('START',key.data,mask)
                 # print(key.data)
                 if key.data is None:
                     accept(sel, key.fileobj)

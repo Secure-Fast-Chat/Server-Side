@@ -41,6 +41,10 @@ class LoadBalancerMessage:
         self.socket = socket
         self.strategy = strategy
         self.sel = sel
+        self._json_header = None
+        self._content = None
+        self._proto_header = None
+        self._recvd_data = b''
 
     def _json_encode(self, obj, encoding = ENCODING_USED):
         """Function to encode dictionary to bytes object
