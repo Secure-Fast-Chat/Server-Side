@@ -11,6 +11,7 @@ import json
 ENCODING_USED = "utf-8"
 
 LBSOCK = None
+LBSOCK_SELECTOR = None
 def accept(sel, sock):
     """Function to accept a new client connection
     """
@@ -49,7 +50,7 @@ def doKeyex(sel, conn):
     print("Accepted Client")
     ##!!
 
-def service(key, mask, HOST, PORT):
+def service(key, mask, HOST, PORT,sel):
     if mask & selectors.EVENT_READ:
         global LOGGED_CLIENTS
         sock = key.fileobj
@@ -70,7 +71,11 @@ def service(key, mask, HOST, PORT):
             if uid != "":
                 print(len(LOGGED_CLIENTS.keys()))
                 if newLogin:
-                    send_lb_new_login_info(uid, HOST, PORT)
+                    content = send_lb_new_login_info(uid, HOST, PORT)
+                    key_lb = sel.get_key(LB_SOCK)
+                    if 'to_send' not in key_lb.data.keys():
+                        key_lb.data['to_send'] = b''
+                    key_lb.data['to_send'] += content
                     # Only send if we didnt have the user connected already
                 LOGGED_CLIENTS[uid] = selKey
             
@@ -81,7 +86,11 @@ def service(key, mask, HOST, PORT):
             sock.close()
             if(uid!=""):
                 del LOGGED_CLIENTS[uid]
-                send_lb_logout_info(uid)
+                content = send_lb_logout_info(uid)
+                key_lb = sel.get_key(LB_SOCK)
+                if 'to_send' not in key_lb.data.keys():
+                    key_lb.data['to_send'] = b''
+                key_lb.data['to_send'] += content
     elif mask & selectors.EVENT_WRITE:
         if "to_send" in key.data.keys():
             n = key.fileobj.send(to_send)
@@ -98,7 +107,7 @@ def send_lb_logout_info(uid):
         "content-length": 0,
     }
     json_header = json.dumps(json_header, ensure_ascii=False).encode(ENCODING_USED)
-    LBSOCK.sendall(struct.pack('>H', len(json_header)) + json_header)
+    return struct.pack('>H', len(json_header)) + json_header
 
 def send_lb_new_login_info(uid, HOST, PORT):
     json_header = {
@@ -110,7 +119,7 @@ def send_lb_new_login_info(uid, HOST, PORT):
         "port": PORT
     }
     json_header = json.dumps(json_header, ensure_ascii=False).encode(ENCODING_USED)
-    LBSOCK.sendall(struct.pack('>H', len(json_header)) + json_header)
+    return struct.pack('>H', len(json_header)) + json_header
 
 def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     global privatekey
@@ -125,7 +134,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     lsock.listen()
     global LBSOCK
     LBSOCK, lbaddr = lsock.accept() # The first connection would be load balancer
-    sel.register(LBSOCK, selectors.EVENT_READ, data = {"loadbalancer": lbaddr})
+    sel.register(LBSOCK, selectors.EVENT_READ | selectors.EVENT_WRITE, data = {"loadbalancer": lbaddr})
     # print(f"The socket is at {LBSOCK}")
     lsock.listen()
 
@@ -142,7 +151,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
-                    service(key, mask, HOST, PORT)
+                    service(key, mask, HOST, PORT,sel)
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
     finally:
