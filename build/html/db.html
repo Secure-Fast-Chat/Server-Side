@@ -35,6 +35,13 @@
   <div class="section" id="module-db">
 <span id="db-module"></span><h1>db module<a class="headerlink" href="#module-db" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
+<dt id="db.deleteOldMessages">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">deleteOldMessages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#db.deleteOldMessages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete messages older than 7 days (can change later)
+This is called when we add some new message to the db</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="db.checkIfUsernameFree">
 <code class="sig-prename descclassname">db.</code><code class="sig-name descname">checkIfUsernameFree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.checkIfUsernameFree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if a given username is already in use</p>
@@ -53,7 +60,7 @@
 
 <dl class="py function">
 <dt id="db.createUser">
-<code class="sig-prename descclassname">db.</code><code class="sig-name descname">createUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.createUser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">createUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">e2ePublicKey</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.createUser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a user with the given username and password to the database. Assumes that the checkIfUsernameFree has already been called before. We hash the password here. Returns true if the user generation happened without any error</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -72,8 +79,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="db.login">
-<code class="sig-prename descclassname">db.</code><code class="sig-name descname">login</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.login" title="Permalink to this definition">¶</a></dt>
+<dt id="db.db_login">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">db_login</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.db_login" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if a given username password pair is present in the db</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -93,14 +100,150 @@
 
 <dl class="py function">
 <dt id="db.storeMessageInDb">
-<code class="sig-prename descclassname">db.</code><code class="sig-name descname">storeMessageInDb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">receiver</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">message</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.storeMessageInDb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">storeMessageInDb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">receiver</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">message</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">timestamp</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">content_type</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.storeMessageInDb" title="Permalink to this definition">¶</a></dt>
 <dd><p>stores the encrypted message in the database, in case it is not possible to send them the message directly</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sender</strong> (<em>str</em>) – sender username (TODO: Do we keep these encrypted?)</p></li>
+<li><p><strong>sender</strong> (<em>str</em>) – sender username</p></li>
 <li><p><strong>receiver</strong> (<em>str</em>) – receiver username</p></li>
 <li><p><strong>message</strong> (<em>str</em>) – the enecrypted message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.getE2EPublicKey">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">getE2EPublicKey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#db.getE2EPublicKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the username and outputs the e2e public key of that user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>str</em>) – username of the user</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the e2ekey in base64</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.getUnsentMessages">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">getUnsentMessages</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#db.getUnsentMessages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the unsent messages to a particular user, ordered by timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>username</strong> (<em>str</em>) – username of receiver</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tuples containing the data about the messages</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.checkIfGroupNameFree">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">checkIfGroupNameFree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupName</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.checkIfGroupNameFree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a given groupname is already in use</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>groupName</strong> – The groupname to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether the name is in use or not</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.createGroup">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">createGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">creatorUsername</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">creatorE2Ekey</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.createGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new group in the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groupname</strong> (<em>str</em>) – name of the group</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – key used for encrypting messages for this group. Note that this is encrypted by the creators e2e encrypted key</p></li>
+<li><p><strong>creatorUsername</strong> (<em>str</em>) – username of creator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.isGroupAdmin">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">isGroupAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupName</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#db.isGroupAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a particular user is the admin of a group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groupName</strong> (<em>str</em>) – name of the group</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – username to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>whether username is an admin of the group</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.addUserToGroup">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">addUserToGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">usersGroupKey</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.addUserToGroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="db.getGroupMembers">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">getGroupMembers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="headerlink" href="#db.getGroupMembers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="db.getUsersGroupKey">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">getUsersGroupKey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>str<span class="p">]</span><a class="headerlink" href="#db.getUsersGroupKey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="db.removeGroupMember">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">removeGroupMember</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.removeGroupMember" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a user from the db of a group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>groupname</strong> (<em>str</em>) – name of the group</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – username to remove</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="db.deleteMessage">
+<code class="sig-prename descclassname">db.</code><code class="sig-name descname">deleteMessage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">receiver</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">sender</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">content</span><span class="p">:</span> <span class="n">bytes</span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.deleteMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a particular message from the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<em>str</em>) – username of the receiver</p></li>
+<li><p><strong>sender</strong> (<em>str</em>) – username of the sender</p></li>
+<li><p><strong>content</strong> (<em>bytes</em>) – content of the message</p></li>
 </ul>
 </dd>
 </dl>
@@ -132,6 +275,8 @@
 <li class="toctree-l2"><a class="reference internal" href="Message.html">Message module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">db module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="startServer.html">startServer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loadbalancer.html">loadbalancer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lb_msg.html">lb_msg module</a></li>
 </ul>
 </li>
 </ul>

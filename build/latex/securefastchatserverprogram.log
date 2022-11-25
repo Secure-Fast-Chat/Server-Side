@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2022.9.4)  16 NOV 2022 16:06
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2022.9.4)  26 NOV 2022 01:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -676,106 +676,226 @@ LaTeX Font Info:    Trying to load font information for T1+pcr on input line 10
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-34.
+40.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 135.
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 141.
  [1
 
-] [2] [3] [4]
+] [2]
+Underfull \hbox (badness 10000) in paragraph at lines 450--450
+[]\T1/ptm/m/it/10 rcvr_uid\T1/ptm/m/n/10 , \T1/ptm/m/it/10 msg_type\T1/ptm/m/n/
+10 , \T1/ptm/m/it/10 con-tent\T1/ptm/m/n/10 , \T1/ptm/m/it/10 grp_uid=None\T1/p
+tm/m/n/10 , \T1/ptm/m/it/10 sender=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 times-t
+amp=None\T1/ptm/m/n/10 ,
+ []
+
+[3] [4] [5] [6] [7] [8] [9] [10]
 Chapter 2.
-[5
+[11
 
-] [6
+] [12
 
-] [7
+] [13
 
 
-] (./securefastchatserverprogram.ind [8
+] (./securefastchatserverprogram.ind [14
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 12--13
-[]\T1/pcr/m/n/10 _login_uid_not_found() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sag
-e.Message
+Underfull \hbox (badness 10000) in paragraph at lines 10--12
+[]\T1/pcr/m/n/10 _getAvailableServerID()
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 14--15
+Underfull \hbox (badness 10000) in paragraph at lines 10--12
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 12--14
+[]\T1/pcr/m/n/10 _getLeastConnServer()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 12--14
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--16
+[]\T1/pcr/m/n/10 _getLsockHostPortFromID()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--16
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+[]\T1/pcr/m/n/10 _getRandomServer()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--19
+[]\T1/pcr/m/n/10 _getRoundRobinServer()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--19
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+[]\T1/pcr/m/n/10 _getSocketFromID()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--20
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 20--22
+[]\T1/pcr/m/n/10 _handle_leave_group_request() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 
+Mes-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 25--26
+[]\T1/pcr/m/n/10 _json_encode() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBala
+ncerMessage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+[]\T1/pcr/m/n/10 _prepareMessage()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--29
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--31
 []\T1/pcr/m/n/10 _process_signup_pass() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sag
 e.Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 15--16
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
 []\T1/pcr/m/n/10 _process_signup_uid() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sage
 .Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 16--17
+Underfull \hbox (badness 10000) in paragraph at lines 32--33
 []\T1/pcr/m/n/10 _recv_data_from_client() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-s
 age.Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 17--18
+Underfull \hbox (badness 10000) in paragraph at lines 34--35
 []\T1/pcr/m/n/10 _send_data_to_client() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sag
 e.Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 19--20
+Underfull \hbox (badness 10000) in paragraph at lines 35--37
+[]\T1/pcr/m/n/10 _send_data_to_client()
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--37
+\T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalancerMessage method\T1/ptm/m/n/10
+ ),
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 40--41
 []\T1/pcr/m/n/10 _send_msg_to_reciever() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sa
 ge.Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 22--23
+Underfull \hbox (badness 10000) in paragraph at lines 43--44
 []\T1/pcr/m/n/10 _signup_uid_available() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sa
 ge.Message
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 23--24
+Underfull \hbox (badness 10000) in paragraph at lines 44--45
 []\T1/pcr/m/n/10 _signup_uid_not_available() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Me
 s-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 24--26
-[]\T1/pcr/m/n/10 _successfully_found_login_uid() \T1/ptm/m/n/10 (\T1/ptm/m/it/1
-0 Mes-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 34--35
+Underfull \hbox (badness 10000) in paragraph at lines 55--56
 []\T1/pcr/m/n/10 check_login_pwd() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 in mod-ule
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 35--36
+Underfull \hbox (badness 10000) in paragraph at lines 56--57
 []\T1/pcr/m/n/10 check_login_uid() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 in mod-ule
  []
 
-[9
 
-]) (./securefastchatserverprogram.aux)
+Underfull \hbox (badness 10000) in paragraph at lines 60--61
+[]\T1/pcr/m/n/10 checkValidityOfUID() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 Mes-sage.
+Message
+ []
+
+[15
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 88--89
+[]\T1/pcr/m/n/10 getUnsentMessages() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 in mod-ule
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--125
+[]\T1/pcr/m/n/10 processClient() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBal
+ancerMessage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 125--126
+[]\T1/pcr/m/n/10 processTask() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 lb_msg.LoadBalan
+cerMessage
+ []
+
+[16]) (./securefastchatserverprogram.aux)
 Package rerunfilecheck Info: File `securefastchatserverprogram.out' has not cha
 nged.
-(rerunfilecheck)             Checksum: 3F3E764DC86D9D4183271E709CE5AEE5;1031.
+(rerunfilecheck)             Checksum: 76584E7ED4694C24E179C5EDCD31DAD4;1309.
  ) 
 Here is how much of TeX's memory you used:
- 13762 strings out of 481176
- 196898 string characters out of 5914227
- 528833 words of memory out of 5000000
- 30334 multiletter control sequences out of 15000+600000
- 442961 words of font info for 77 fonts, out of 8000000 for 9000
+ 13862 strings out of 481176
+ 199193 string characters out of 5914227
+ 530713 words of memory out of 5000000
+ 30384 multiletter control sequences out of 15000+600000
+ 443294 words of font info for 78 fonts, out of 8000000 for 9000
  60 hyphenation exceptions out of 8191
- 83i,11n,88p,524b,546s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 83i,12n,88p,565b,675s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/
@@ -785,10 +905,10 @@ rier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvb8a
 hare/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/urw/times/utmri8a.pfb>
-Output written on securefastchatserverprogram.pdf (13 pages, 112892 bytes).
+Output written on securefastchatserverprogram.pdf (20 pages, 141184 bytes).
 PDF statistics:
- 239 PDF objects out of 1000 (max. 8388607)
- 207 compressed objects within 3 object streams
- 55 named destinations out of 1000 (max. 500000)
- 85 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 375 PDF objects out of 1000 (max. 8388607)
+ 335 compressed objects within 4 object streams
+ 104 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -14,6 +14,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="loadbalancer module" href="loadbalancer.html" />
     <link rel="prev" title="db module" href="db.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -35,14 +36,60 @@
 <span id="startserver-module"></span><h1>startServer module<a class="headerlink" href="#module-startServer" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="startServer.accept">
-<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">accept</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sel</span></em>, <em class="sig-param"><span class="n">sock</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.accept" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">accept</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sel</span></em>, <em class="sig-param"><span class="n">sock</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.accept" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to accept a new client connection</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="startServer.service">
-<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">service</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.service" title="Permalink to this definition">¶</a></dt>
+<dt id="startServer.doKeyex">
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">doKeyex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">selkey</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.doKeyex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt id="startServer.service">
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">service</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">mask</span></em>, <em class="sig-param"><span class="n">HOST</span></em>, <em class="sig-param"><span class="n">PORT</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="startServer.send_lb_logout_info">
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">send_lb_logout_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.send_lb_logout_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells the ;pad balancer about which user has logged out</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>uid</strong> (<em>str</em>) – user id of the user that has logged out,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="startServer.send_lb_new_login_info">
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">send_lb_new_login_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em>, <em class="sig-param"><span class="n">HOST</span></em>, <em class="sig-param"><span class="n">PORT</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.send_lb_new_login_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells the load balancer about which user has logged in</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uid</strong> (<em>str</em><em>,</em>) – User id of the user that has logged in,</p></li>
+<li><p><strong>HOST</strong> (<em>str</em><em>,</em>) – host of the load balancer,</p></li>
+<li><p><strong>PORT</strong> (<em>int</em>) – port of the load balancer,</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="startServer.startServer">
+<code class="sig-prename descclassname">startServer.</code><code class="sig-name descname">startServer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pvtKey</span></em>, <em class="sig-param"><span class="n">HOST</span><span class="o">=</span><span class="default_value">'127.0.0.1'</span></em>, <em class="sig-param"><span class="n">PORT</span><span class="o">=</span><span class="default_value">8000</span></em><span class="sig-paren">)</span><a class="headerlink" href="#startServer.startServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Server starts and connects to the socket of the load balancer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvtKey</strong> (<em>nacl.public.PrivateKey</em><em>,</em>) – private key of the server,</p></li>
+<li><p><strong>HOST</strong> (<em>str</em><em>,</em>) – host of the loadbalancer,</p></li>
+<li><p><strong>PORT</strong> (<em>int</em>) – port of the loadbalancer,</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 
@@ -70,6 +117,8 @@
 <li class="toctree-l2"><a class="reference internal" href="Message.html">Message module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="db.html">db module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">startServer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loadbalancer.html">loadbalancer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lb_msg.html">lb_msg module</a></li>
 </ul>
 </li>
 </ul>
@@ -80,6 +129,7 @@
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="modules.html">Server-Side</a><ul>
       <li>Previous: <a href="db.html" title="previous chapter">db module</a></li>
+      <li>Next: <a href="loadbalancer.html" title="next chapter">loadbalancer module</a></li>
   </ul></li>
   </ul></li>
 </ul>

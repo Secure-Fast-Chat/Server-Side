@@ -36,13 +36,12 @@
 <span id="message-module"></span><h1>Message module<a class="headerlink" href="#module-Message" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="Message.Message">
-<em class="property">class </em><code class="sig-prename descclassname">Message.</code><code class="sig-name descname">Message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_socket</span></em>, <em class="sig-param"><span class="n">status</span></em>, <em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">sel</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">Message.</code><code class="sig-name descname">Message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_socket</span></em>, <em class="sig-param"><span class="n">status</span></em>, <em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">sel</span></em>, <em class="sig-param"><span class="n">loggedClients</span></em>, <em class="sig-param"><span class="n">lbsock</span></em>, <em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">encrypt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is the class to handle Encryption of messages. The format in which the message is sent to client is determined in this class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>task</strong> (<em>str</em>) – Task to be done. It can have the values signup, login, send_message</p></li>
 <li><p><strong>socket</strong> (<em>socket.socket</em>) – The socket used for connection with Server</p></li>
 <li><p><strong>request_content</strong> (<em>dict</em>) – Content to include in the request to send to server</p></li>
 <li><p><strong>_data_to_send</strong> (<em>bytes</em>) – Contains the data to send to the server</p></li>
@@ -55,24 +54,67 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>conn_socket</strong> (<em>socket.socket</em>) – Socket which has a connection with client</p></li>
-<li><p><strong>task</strong> (<em>str</em>) – Task to do. It can have values: login, signup, send_message</p></li>
 <li><p><strong>request</strong> (<em>str</em>) – Content to send to server</p></li>
+<li><p><strong>encrypt</strong> – Whether the received data would be encrypted</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
+<dt id="Message.Message.fromSelKey">
+<em class="property">classmethod </em><code class="sig-name descname">fromSelKey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">selectorKey</span></em>, <em class="sig-param"><span class="n">loggedClients</span></em>, <em class="sig-param"><span class="n">lbsock</span></em>, <em class="sig-param"><span class="n">selector</span></em>, <em class="sig-param"><span class="n">encrypt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.fromSelKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom constructor to initialise a message given just the selector key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>selectorKey</strong> (<em>SelectorKey</em>) – the selector key containitnall the data</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#Message.Message" title="Message.Message">Message</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="Message.Message._send_data_to_client">
 <code class="sig-name descname">_send_data_to_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_data_to_client" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to send the string to the client. It sends content of _send_data_to_client to the client</p>
+<dd><p>Function to send the string to the client. It sends content of _send_data_to_client to the client.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.encrypt">
+<code class="sig-name descname">encrypt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">bytes</span></em><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>bytes</em>) – the data to encrypt</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Encrypted Message</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="Message.Message._recv_data_from_client">
-<code class="sig-name descname">_recv_data_from_client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._recv_data_from_client" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_recv_data_from_client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">encrypted</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#Message.Message._recv_data_from_client" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to recv data from client. Stores the bytes recieved in a variable named _recvd_msg.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>size</strong> (<em>int</em>) – Length of content to recieve from server</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<em>int</em>) – the size of data to receive</p></li>
+<li><p><strong>encrypted</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the incoming data is supposed to be encrypted, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>code to see if something works. Returns -1 if the connection closed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -81,6 +123,11 @@
 <dt id="Message.Message._send_msg_to_reciever">
 <code class="sig-name descname">_send_msg_to_reciever</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_sock</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_msg_to_reciever" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to send message to a reciever</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rcvr_sock</strong> (<em>Socket</em>) – The socket to which to send</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -125,7 +172,7 @@
 
 <dl class="py method">
 <dt id="Message.Message.processTask">
-<code class="sig-name descname">processTask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">loggedClients</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.processTask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">processTask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.processTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes the task to do</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -138,14 +185,125 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="Message.Message._handle_leave_group_request">
+<code class="sig-name descname">_handle_leave_group_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_uid</span></em>, <em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._handle_leave_group_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to remove member from group based on leave request</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>guid</strong> (<em>str</em>) – Group to remove from</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) – user to remove</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._rem_grp_mem">
+<code class="sig-name descname">_rem_grp_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_uid</span></em>, <em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._rem_grp_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a member from group, checking the validity of group id, user id and connecting with the database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grp_uid</strong> (<em>str</em><em>,</em>) – group id,</p></li>
+<li><p><strong>uid</strong> (<em>str</em>) – user id,</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._send_grp_message">
+<code class="sig-name descname">_send_grp_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_uid</span></em>, <em class="sig-param"><span class="n">msg_type</span></em>, <em class="sig-param"><span class="n">content</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_grp_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send messages in a group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grp_uid</strong> (<em>str</em>) – Id of the group in which message is to be sent</p></li>
+<li><p><strong>msg_type</strong> (<em>str</em>) – Type of message to be send, text or file object</p></li>
+<li><p><strong>content</strong> (<em>str</em>) – message to be sent</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._add_grp_mem">
+<code class="sig-name descname">_add_grp_mem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_uid</span></em>, <em class="sig-param"><span class="n">new_uid</span></em>, <em class="sig-param"><span class="n">user_grp_key</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._add_grp_mem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to add a new member in the group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grp_uid</strong> (<em>str</em>) – id of the group in which member is to be added</p></li>
+<li><p><strong>new_uid</strong> (<em>str</em>) – user id of the new user which is to be added in the group</p></li>
+<li><p><strong>user_grp_key</strong> (<em>str</em>) – Public key of the group</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._create_grp">
+<code class="sig-name descname">_create_grp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_uid</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">grp_key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._create_grp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grp_uid</strong> (<em>str</em>) – name of the group</p></li>
+<li><p><strong>grp_key</strong> (<em>str</em>) – the key used for encrypting messages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1 if there was an error, 0 otherwise</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._send_group_key">
+<code class="sig-name descname">_send_group_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">grp_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">username</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#Message.Message._send_group_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a json response containing the group key for a particular user, which can be decrypted by only that user to get the actual private key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grp_name</strong> (<em>str</em>) – name of the group</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – name of the user</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="Message.Message._send_msg">
-<code class="sig-name descname">_send_msg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span></em>, <em class="sig-param"><span class="n">msg_type</span></em>, <em class="sig-param"><span class="n">content</span></em>, <em class="sig-param"><span class="n">loggedClients</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_msg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">_send_msg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span></em>, <em class="sig-param"><span class="n">msg_type</span></em>, <em class="sig-param"><span class="n">content</span></em>, <em class="sig-param"><span class="n">grp_uid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sender</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timestamp</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends messages to the specified user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rcvr_uid</strong> (<em>str</em>) – User ID of the reciever client</p></li>
+<li><p><strong>msg_type</strong> (<em>str</em>) – Type of message, text or file</p></li>
+<li><p><strong>content</strong> (<em>str</em>) – Encrypted message to be sent</p></li>
+<li><p><strong>grp_uid</strong> (<em>str</em>) – GroupId in case of group message</p></li>
+<li><p><strong>sender</strong> (<em>str</em>) – name of the message sender, in case of group chat, it is grp_id::user_id, otherwise it is username of self</p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – whether to save if the receiver is not directly connected to the server</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="Message.Message._send_rcvr_key">
-<code class="sig-name descname">_send_rcvr_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._send_rcvr_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">_send_rcvr_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rcvr_uid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#Message.Message._send_rcvr_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the public key of a given user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rcvr_uid</strong> (<em>str</em>) – User id of the user whose public key is requested</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="Message.Message.keyex">
@@ -153,7 +311,7 @@
 <dd><p>Does key exchange. First waits for request from the client, then sends a response with its own public key. Returns a string containing the public key of the client</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>public key of the client</p>
+<dd class="field-odd"><p>public key of the client, encoded to base64</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>str</p>
@@ -163,77 +321,183 @@
 
 <dl class="py method">
 <dt id="Message.Message._process_login">
-<code class="sig-name descname">_process_login</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_login" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._login_failed">
-<code class="sig-name descname">_login_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_failed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._login_successful">
-<code class="sig-name descname">_login_successful</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_successful" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._login_uid_not_found">
-<code class="sig-name descname">_login_uid_not_found</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._login_uid_not_found" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._successfully_found_login_uid">
-<code class="sig-name descname">_successfully_found_login_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._successfully_found_login_uid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._signup_failed">
-<code class="sig-name descname">_signup_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_failed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._successfully_signed_up">
-<code class="sig-name descname">_successfully_signed_up</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._successfully_signed_up" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._process_signup_uid">
-<code class="sig-name descname">_process_signup_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_signup_uid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._signup_uid_not_available">
-<code class="sig-name descname">_signup_uid_not_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_uid_not_available" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._signup_uid_available">
-<code class="sig-name descname">_signup_uid_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._signup_uid_available" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="Message.Message._process_signup_pass">
-<code class="sig-name descname">_process_signup_pass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">encrypted_pass</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_signup_pass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process the command for signing up the user and storing the password</p>
+<code class="sig-name descname">_process_login</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em>, <em class="sig-param"><span class="n">password</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._process_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes Login Request
+On successful login sends pending messages</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>encrypted_pass</strong> – The encoded password</p></li>
-<li><p><strong>client_public_key</strong> – Public key of the client</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – Username of the Client to be logged in</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – Password of the Client to be logged in</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="Message.Message.isOnline">
-<code class="sig-name descname">isOnline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.isOnline" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="Message.Message._login_failed">
+<code class="sig-name descname">_login_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._login_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send after a failed login attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>reponse after failed login</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt id="Message.Message.get_uid_sock">
-<code class="sig-name descname">get_uid_sock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.get_uid_sock" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="Message.Message._login_successful">
+<code class="sig-name descname">_login_successful</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._login_successful" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response after a succesful login</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>response after a succesful login</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_failed">
+<code class="sig-name descname">_signup_failed</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._signup_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send after a failed signup attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>reponse after failed signup</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._successfully_signed_up">
+<code class="sig-name descname">_successfully_signed_up</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._successfully_signed_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send after a succesful login attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>reponse after succesful login</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._process_signup_uid">
+<code class="sig-name descname">_process_signup_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#Message.Message._process_signup_uid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes Signup Request by validating if requested Uid already exists or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>uid</strong> (<em>str</em>) – User ID of new user</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._invalid_uid_type">
+<code class="sig-name descname">_invalid_uid_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message._invalid_uid_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send if the username is of the wrong type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>protoheader + a json header which does not containt the availability key</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.checkValidityOfUID">
+<code class="sig-name descname">checkValidityOfUID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Message.Message.checkValidityOfUID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to check if the uid is valid. A valid uid is one which has only a-z,A-Z,0-9,_ characters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>uid</strong> (<em>str</em>) – User id to check for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Return True if valid</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_uid_not_available">
+<code class="sig-name descname">_signup_uid_not_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._signup_uid_not_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send if the username is already taken</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>protoheader + a json header saying that the availability is 0</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._signup_uid_available">
+<code class="sig-name descname">_signup_uid_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bytes<a class="headerlink" href="#Message.Message._signup_uid_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the response to send if the username is free</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>protoheader + a json header saying that the availability is 1</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message._process_signup_pass">
+<code class="sig-name descname">_process_signup_pass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">e2eKey</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#Message.Message._process_signup_pass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the command for signing up the user and storing the password</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>password</strong> (<em>str</em>) – The password</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.isOnline">
+<code class="sig-name descname">isOnline</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#Message.Message.isOnline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns if the user is online</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Is the user online</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Message.Message.get_uid_selKey">
+<code class="sig-name descname">get_uid_selKey</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>str<span class="p">, </span>selectors.SelectorKey<span class="p">, </span>bool<span class="p">]</span><a class="headerlink" href="#Message.Message.get_uid_selKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to get the username and selectorkey</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A tuples containing the username and selectorkey and whether this message led to a new login</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple[str, selectors.SelectorKey, bool]</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -263,6 +527,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Message module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="db.html">db module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="startServer.html">startServer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loadbalancer.html">loadbalancer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lb_msg.html">lb_msg module</a></li>
 </ul>
 </li>
 </ul>

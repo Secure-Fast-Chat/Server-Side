@@ -5,60 +5,106 @@
 \let\spxextra \sphinxstyleindexextra
 
   \bigletter {\sphinxsymbolsname}
+  \item \spxentry{\_add\_grp\_mem()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_create\_grp()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_getAvailableServerID()}\spxextra{lb\_msg.LoadBalancerMessage method}, 
+		\hyperpage{9}
+  \item \spxentry{\_getLeastConnServer()}\spxextra{lb\_msg.LoadBalancerMessage method}, 
+		\hyperpage{9}
+  \item \spxentry{\_getLsockHostPortFromID()}\spxextra{lb\_msg.LoadBalancerMessage method}, 
+		\hyperpage{9}
+  \item \spxentry{\_getRandomServer()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{9}
+  \item \spxentry{\_getRoundRobinServer()}\spxextra{lb\_msg.LoadBalancerMessage method}, 
+		\hyperpage{9}
+  \item \spxentry{\_getSocketFromID()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{9}
+  \item \spxentry{\_handle\_leave\_group\_request()}\spxextra{Message.Message method}, 
+		\hyperpage{2}
+  \item \spxentry{\_invalid\_uid\_type()}\spxextra{Message.Message method}, \hyperpage{4}
   \item \spxentry{\_json\_decode()}\spxextra{Message.Message method}, \hyperpage{2}
   \item \spxentry{\_json\_encode()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_login\_failed()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_login\_successful()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_login\_uid\_not\_found()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_process\_login()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_process\_signup\_pass()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_process\_signup\_uid()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_recv\_data\_from\_client()}\spxextra{Message.Message method}, \hyperpage{1}
-  \item \spxentry{\_send\_data\_to\_client()}\spxextra{Message.Message method}, \hyperpage{1}
-  \item \spxentry{\_send\_msg()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_send\_msg\_to\_reciever()}\spxextra{Message.Message method}, \hyperpage{1}
-  \item \spxentry{\_send\_rcvr\_key()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_signup\_failed()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_signup\_uid\_available()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_signup\_uid\_not\_available()}\spxextra{Message.Message method}, \hyperpage{2}
-  \item \spxentry{\_successfully\_found\_login\_uid()}\spxextra{Message.Message method}, 
-		\hyperpage{2}
-  \item \spxentry{\_successfully\_signed\_up()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_json\_encode()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{8}
+  \item \spxentry{\_login\_failed()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_login\_successful()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_prepareMessage()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{9}
+  \item \spxentry{\_process\_login()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_process\_signup\_pass()}\spxextra{Message.Message method}, \hyperpage{5}
+  \item \spxentry{\_process\_signup\_uid()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_recv\_data\_from\_client()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_rem\_grp\_mem()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_send\_data\_to\_client()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_send\_data\_to\_client()}\spxextra{lb\_msg.LoadBalancerMessage method}, 
+		\hyperpage{10}
+  \item \spxentry{\_send\_group\_key()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_send\_grp\_message()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_send\_msg()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{\_send\_msg\_to\_reciever()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{\_send\_rcvr\_key()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_signup\_failed()}\spxextra{Message.Message method}, \hyperpage{4}
+  \item \spxentry{\_signup\_uid\_available()}\spxextra{Message.Message method}, \hyperpage{5}
+  \item \spxentry{\_signup\_uid\_not\_available()}\spxextra{Message.Message method}, \hyperpage{5}
+  \item \spxentry{\_successfully\_signed\_up()}\spxextra{Message.Message method}, \hyperpage{4}
 
   \indexspace
   \bigletter A
-  \item \spxentry{accept()}\spxextra{in module startServer}, \hyperpage{4}
+  \item \spxentry{accept()}\spxextra{in module loadbalancer}, \hyperpage{8}
+  \item \spxentry{accept()}\spxextra{in module startServer}, \hyperpage{7}
+  \item \spxentry{addUserToGroup()}\spxextra{in module db}, \hyperpage{7}
 
   \indexspace
   \bigletter C
   \item \spxentry{check\_login\_pwd()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
   \item \spxentry{check\_login\_uid()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
-  \item \spxentry{checkIfUsernameFree()}\spxextra{in module db}, \hyperpage{3}
+  \item \spxentry{checkIfGroupNameFree()}\spxextra{in module db}, \hyperpage{6}
+  \item \spxentry{checkIfUsernameFree()}\spxextra{in module db}, \hyperpage{5}
   \item \spxentry{checkuid()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
-  \item \spxentry{createUser()}\spxextra{in module db}, \hyperpage{3}
+  \item \spxentry{checkValidityOfUID()}\spxextra{Message.Message method}, \hyperpage{5}
+  \item \spxentry{createGroup()}\spxextra{in module db}, \hyperpage{6}
+  \item \spxentry{createUser()}\spxextra{in module db}, \hyperpage{5}
 
   \indexspace
   \bigletter D
   \item \spxentry{DatabaseRequestHandler}
     \subitem \spxentry{module}, \hyperpage{1}
   \item \spxentry{db}
-    \subitem \spxentry{module}, \hyperpage{3}
+    \subitem \spxentry{module}, \hyperpage{5}
+  \item \spxentry{db\_login()}\spxextra{in module db}, \hyperpage{6}
+  \item \spxentry{deleteMessage()}\spxextra{in module db}, \hyperpage{7}
+  \item \spxentry{deleteOldMessages()}\spxextra{in module db}, \hyperpage{5}
+  \item \spxentry{doKeyex()}\spxextra{in module startServer}, \hyperpage{7}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{encrypt()}\spxextra{Message.Message method}, \hyperpage{2}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{fromSelKey()}\spxextra{Message.Message class method}, \hyperpage{1}
 
   \indexspace
   \bigletter G
-  \item \spxentry{get\_uid\_sock()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{get\_uid\_selKey()}\spxextra{Message.Message method}, \hyperpage{5}
+  \item \spxentry{getE2EPublicKey()}\spxextra{in module db}, \hyperpage{6}
+  \item \spxentry{getGroupMembers()}\spxextra{in module db}, \hyperpage{7}
+  \item \spxentry{getUnsentMessages()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
+  \item \spxentry{getUnsentMessages()}\spxextra{in module db}, \hyperpage{6}
+  \item \spxentry{getUsersGroupKey()}\spxextra{in module db}, \hyperpage{7}
 
   \indexspace
   \bigletter I
-  \item \spxentry{isOnline()}\spxextra{Message.Message method}, \hyperpage{3}
+  \item \spxentry{isGroupAdmin()}\spxextra{in module db}, \hyperpage{7}
+  \item \spxentry{isOnline()}\spxextra{Message.Message method}, \hyperpage{5}
 
   \indexspace
   \bigletter K
-  \item \spxentry{keyex()}\spxextra{Message.Message method}, \hyperpage{2}
+  \item \spxentry{keyex()}\spxextra{Message.Message method}, \hyperpage{4}
 
   \indexspace
   \bigletter L
-  \item \spxentry{login()}\spxextra{in module db}, \hyperpage{3}
+  \item \spxentry{lb\_msg}
+    \subitem \spxentry{module}, \hyperpage{8}
+  \item \spxentry{loadbalancer}
+    \subitem \spxentry{module}, \hyperpage{8}
+  \item \spxentry{LoadBalancerMessage}\spxextra{class in lb\_msg}, \hyperpage{8}
 
   \indexspace
   \bigletter M
@@ -67,20 +113,34 @@
   \item \spxentry{Message}\spxextra{class in Message}, \hyperpage{1}
   \item \spxentry{module}
     \subitem \spxentry{DatabaseRequestHandler}, \hyperpage{1}
-    \subitem \spxentry{db}, \hyperpage{3}
+    \subitem \spxentry{db}, \hyperpage{5}
+    \subitem \spxentry{lb\_msg}, \hyperpage{8}
+    \subitem \spxentry{loadbalancer}, \hyperpage{8}
     \subitem \spxentry{Message}, \hyperpage{1}
-    \subitem \spxentry{startServer}, \hyperpage{4}
+    \subitem \spxentry{startServer}, \hyperpage{7}
 
   \indexspace
   \bigletter P
+  \item \spxentry{processClient()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{10}
+  \item \spxentry{processTask()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{10}
   \item \spxentry{processTask()}\spxextra{Message.Message method}, \hyperpage{2}
 
   \indexspace
+  \bigletter R
+  \item \spxentry{readFromSocket()}\spxextra{lb\_msg.LoadBalancerMessage method}, \hyperpage{9}
+  \item \spxentry{registerServer()}\spxextra{in module loadbalancer}, \hyperpage{8}
+  \item \spxentry{removeGroupMember()}\spxextra{in module db}, \hyperpage{7}
+
+  \indexspace
   \bigletter S
-  \item \spxentry{service()}\spxextra{in module startServer}, \hyperpage{4}
+  \item \spxentry{send\_lb\_logout\_info()}\spxextra{in module startServer}, \hyperpage{7}
+  \item \spxentry{send\_lb\_new\_login\_info()}\spxextra{in module startServer}, \hyperpage{7}
+  \item \spxentry{serverComm()}\spxextra{in module loadbalancer}, \hyperpage{8}
+  \item \spxentry{service()}\spxextra{in module startServer}, \hyperpage{7}
   \item \spxentry{setpass()}\spxextra{in module DatabaseRequestHandler}, \hyperpage{1}
   \item \spxentry{startServer}
-    \subitem \spxentry{module}, \hyperpage{4}
-  \item \spxentry{storeMessageInDb()}\spxextra{in module db}, \hyperpage{3}
+    \subitem \spxentry{module}, \hyperpage{7}
+  \item \spxentry{startServer()}\spxextra{in module startServer}, \hyperpage{8}
+  \item \spxentry{storeMessageInDb()}\spxextra{in module db}, \hyperpage{6}
 
 \end{sphinxtheindex}

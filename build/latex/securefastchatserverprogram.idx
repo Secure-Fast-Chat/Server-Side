@@ -4,38 +4,82 @@
 \indexentry{setpass() (in module DatabaseRequestHandler)@\spxentry{setpass()}\spxextra{in module DatabaseRequestHandler}|hyperpage}{1}
 \indexentry{check\_login\_uid() (in module DatabaseRequestHandler)@\spxentry{check\_login\_uid()}\spxextra{in module DatabaseRequestHandler}|hyperpage}{1}
 \indexentry{check\_login\_pwd() (in module DatabaseRequestHandler)@\spxentry{check\_login\_pwd()}\spxextra{in module DatabaseRequestHandler}|hyperpage}{1}
+\indexentry{getUnsentMessages() (in module DatabaseRequestHandler)@\spxentry{getUnsentMessages()}\spxextra{in module DatabaseRequestHandler}|hyperpage}{1}
 \indexentry{module@\spxentry{module}!Message@\spxentry{Message}|hyperpage}{1}
 \indexentry{Message@\spxentry{Message}!module@\spxentry{module}|hyperpage}{1}
 \indexentry{Message (class in Message)@\spxentry{Message}\spxextra{class in Message}|hyperpage}{1}
-\indexentry{\_send\_data\_to\_client() (Message.Message method)@\spxentry{\_send\_data\_to\_client()}\spxextra{Message.Message method}|hyperpage}{1}
-\indexentry{\_recv\_data\_from\_client() (Message.Message method)@\spxentry{\_recv\_data\_from\_client()}\spxextra{Message.Message method}|hyperpage}{1}
-\indexentry{\_send\_msg\_to\_reciever() (Message.Message method)@\spxentry{\_send\_msg\_to\_reciever()}\spxextra{Message.Message method}|hyperpage}{1}
+\indexentry{fromSelKey() (Message.Message class method)@\spxentry{fromSelKey()}\spxextra{Message.Message class method}|hyperpage}{1}
+\indexentry{\_send\_data\_to\_client() (Message.Message method)@\spxentry{\_send\_data\_to\_client()}\spxextra{Message.Message method}|hyperpage}{2}
+\indexentry{encrypt() (Message.Message method)@\spxentry{encrypt()}\spxextra{Message.Message method}|hyperpage}{2}
+\indexentry{\_recv\_data\_from\_client() (Message.Message method)@\spxentry{\_recv\_data\_from\_client()}\spxextra{Message.Message method}|hyperpage}{2}
+\indexentry{\_send\_msg\_to\_reciever() (Message.Message method)@\spxentry{\_send\_msg\_to\_reciever()}\spxextra{Message.Message method}|hyperpage}{2}
 \indexentry{\_json\_encode() (Message.Message method)@\spxentry{\_json\_encode()}\spxextra{Message.Message method}|hyperpage}{2}
 \indexentry{\_json\_decode() (Message.Message method)@\spxentry{\_json\_decode()}\spxextra{Message.Message method}|hyperpage}{2}
 \indexentry{processTask() (Message.Message method)@\spxentry{processTask()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_send\_msg() (Message.Message method)@\spxentry{\_send\_msg()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_send\_rcvr\_key() (Message.Message method)@\spxentry{\_send\_rcvr\_key()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{keyex() (Message.Message method)@\spxentry{keyex()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_process\_login() (Message.Message method)@\spxentry{\_process\_login()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_login\_failed() (Message.Message method)@\spxentry{\_login\_failed()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_login\_successful() (Message.Message method)@\spxentry{\_login\_successful()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_login\_uid\_not\_found() (Message.Message method)@\spxentry{\_login\_uid\_not\_found()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_successfully\_found\_login\_uid() (Message.Message method)@\spxentry{\_successfully\_found\_login\_uid()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_signup\_failed() (Message.Message method)@\spxentry{\_signup\_failed()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_successfully\_signed\_up() (Message.Message method)@\spxentry{\_successfully\_signed\_up()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_process\_signup\_uid() (Message.Message method)@\spxentry{\_process\_signup\_uid()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_signup\_uid\_not\_available() (Message.Message method)@\spxentry{\_signup\_uid\_not\_available()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_signup\_uid\_available() (Message.Message method)@\spxentry{\_signup\_uid\_available()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{\_process\_signup\_pass() (Message.Message method)@\spxentry{\_process\_signup\_pass()}\spxextra{Message.Message method}|hyperpage}{2}
-\indexentry{isOnline() (Message.Message method)@\spxentry{isOnline()}\spxextra{Message.Message method}|hyperpage}{3}
-\indexentry{get\_uid\_sock() (Message.Message method)@\spxentry{get\_uid\_sock()}\spxextra{Message.Message method}|hyperpage}{3}
-\indexentry{module@\spxentry{module}!db@\spxentry{db}|hyperpage}{3}
-\indexentry{db@\spxentry{db}!module@\spxentry{module}|hyperpage}{3}
-\indexentry{checkIfUsernameFree() (in module db)@\spxentry{checkIfUsernameFree()}\spxextra{in module db}|hyperpage}{3}
-\indexentry{createUser() (in module db)@\spxentry{createUser()}\spxextra{in module db}|hyperpage}{3}
-\indexentry{login() (in module db)@\spxentry{login()}\spxextra{in module db}|hyperpage}{3}
-\indexentry{storeMessageInDb() (in module db)@\spxentry{storeMessageInDb()}\spxextra{in module db}|hyperpage}{3}
-\indexentry{module@\spxentry{module}!startServer@\spxentry{startServer}|hyperpage}{4}
-\indexentry{startServer@\spxentry{startServer}!module@\spxentry{module}|hyperpage}{4}
-\indexentry{accept() (in module startServer)@\spxentry{accept()}\spxextra{in module startServer}|hyperpage}{4}
-\indexentry{service() (in module startServer)@\spxentry{service()}\spxextra{in module startServer}|hyperpage}{4}
+\indexentry{\_handle\_leave\_group\_request() (Message.Message method)@\spxentry{\_handle\_leave\_group\_request()}\spxextra{Message.Message method}|hyperpage}{2}
+\indexentry{\_rem\_grp\_mem() (Message.Message method)@\spxentry{\_rem\_grp\_mem()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_send\_grp\_message() (Message.Message method)@\spxentry{\_send\_grp\_message()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_add\_grp\_mem() (Message.Message method)@\spxentry{\_add\_grp\_mem()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_create\_grp() (Message.Message method)@\spxentry{\_create\_grp()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_send\_group\_key() (Message.Message method)@\spxentry{\_send\_group\_key()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_send\_msg() (Message.Message method)@\spxentry{\_send\_msg()}\spxextra{Message.Message method}|hyperpage}{3}
+\indexentry{\_send\_rcvr\_key() (Message.Message method)@\spxentry{\_send\_rcvr\_key()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{keyex() (Message.Message method)@\spxentry{keyex()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_process\_login() (Message.Message method)@\spxentry{\_process\_login()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_login\_failed() (Message.Message method)@\spxentry{\_login\_failed()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_login\_successful() (Message.Message method)@\spxentry{\_login\_successful()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_signup\_failed() (Message.Message method)@\spxentry{\_signup\_failed()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_successfully\_signed\_up() (Message.Message method)@\spxentry{\_successfully\_signed\_up()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_process\_signup\_uid() (Message.Message method)@\spxentry{\_process\_signup\_uid()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{\_invalid\_uid\_type() (Message.Message method)@\spxentry{\_invalid\_uid\_type()}\spxextra{Message.Message method}|hyperpage}{4}
+\indexentry{checkValidityOfUID() (Message.Message method)@\spxentry{checkValidityOfUID()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{\_signup\_uid\_not\_available() (Message.Message method)@\spxentry{\_signup\_uid\_not\_available()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{\_signup\_uid\_available() (Message.Message method)@\spxentry{\_signup\_uid\_available()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{\_process\_signup\_pass() (Message.Message method)@\spxentry{\_process\_signup\_pass()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{isOnline() (Message.Message method)@\spxentry{isOnline()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{get\_uid\_selKey() (Message.Message method)@\spxentry{get\_uid\_selKey()}\spxextra{Message.Message method}|hyperpage}{5}
+\indexentry{module@\spxentry{module}!db@\spxentry{db}|hyperpage}{5}
+\indexentry{db@\spxentry{db}!module@\spxentry{module}|hyperpage}{5}
+\indexentry{deleteOldMessages() (in module db)@\spxentry{deleteOldMessages()}\spxextra{in module db}|hyperpage}{5}
+\indexentry{checkIfUsernameFree() (in module db)@\spxentry{checkIfUsernameFree()}\spxextra{in module db}|hyperpage}{5}
+\indexentry{createUser() (in module db)@\spxentry{createUser()}\spxextra{in module db}|hyperpage}{5}
+\indexentry{db\_login() (in module db)@\spxentry{db\_login()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{storeMessageInDb() (in module db)@\spxentry{storeMessageInDb()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{getE2EPublicKey() (in module db)@\spxentry{getE2EPublicKey()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{getUnsentMessages() (in module db)@\spxentry{getUnsentMessages()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{checkIfGroupNameFree() (in module db)@\spxentry{checkIfGroupNameFree()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{createGroup() (in module db)@\spxentry{createGroup()}\spxextra{in module db}|hyperpage}{6}
+\indexentry{isGroupAdmin() (in module db)@\spxentry{isGroupAdmin()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{addUserToGroup() (in module db)@\spxentry{addUserToGroup()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{getGroupMembers() (in module db)@\spxentry{getGroupMembers()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{getUsersGroupKey() (in module db)@\spxentry{getUsersGroupKey()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{removeGroupMember() (in module db)@\spxentry{removeGroupMember()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{deleteMessage() (in module db)@\spxentry{deleteMessage()}\spxextra{in module db}|hyperpage}{7}
+\indexentry{module@\spxentry{module}!startServer@\spxentry{startServer}|hyperpage}{7}
+\indexentry{startServer@\spxentry{startServer}!module@\spxentry{module}|hyperpage}{7}
+\indexentry{accept() (in module startServer)@\spxentry{accept()}\spxextra{in module startServer}|hyperpage}{7}
+\indexentry{doKeyex() (in module startServer)@\spxentry{doKeyex()}\spxextra{in module startServer}|hyperpage}{7}
+\indexentry{service() (in module startServer)@\spxentry{service()}\spxextra{in module startServer}|hyperpage}{7}
+\indexentry{send\_lb\_logout\_info() (in module startServer)@\spxentry{send\_lb\_logout\_info()}\spxextra{in module startServer}|hyperpage}{7}
+\indexentry{send\_lb\_new\_login\_info() (in module startServer)@\spxentry{send\_lb\_new\_login\_info()}\spxextra{in module startServer}|hyperpage}{7}
+\indexentry{startServer() (in module startServer)@\spxentry{startServer()}\spxextra{in module startServer}|hyperpage}{8}
+\indexentry{module@\spxentry{module}!loadbalancer@\spxentry{loadbalancer}|hyperpage}{8}
+\indexentry{loadbalancer@\spxentry{loadbalancer}!module@\spxentry{module}|hyperpage}{8}
+\indexentry{accept() (in module loadbalancer)@\spxentry{accept()}\spxextra{in module loadbalancer}|hyperpage}{8}
+\indexentry{registerServer() (in module loadbalancer)@\spxentry{registerServer()}\spxextra{in module loadbalancer}|hyperpage}{8}
+\indexentry{serverComm() (in module loadbalancer)@\spxentry{serverComm()}\spxextra{in module loadbalancer}|hyperpage}{8}
+\indexentry{module@\spxentry{module}!lb\_msg@\spxentry{lb\_msg}|hyperpage}{8}
+\indexentry{lb\_msg@\spxentry{lb\_msg}!module@\spxentry{module}|hyperpage}{8}
+\indexentry{LoadBalancerMessage (class in lb\_msg)@\spxentry{LoadBalancerMessage}\spxextra{class in lb\_msg}|hyperpage}{8}
+\indexentry{\_json\_encode() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_json\_encode()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{8}
+\indexentry{\_getAvailableServerID() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getAvailableServerID()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_getLeastConnServer() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getLeastConnServer()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_getRoundRobinServer() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getRoundRobinServer()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_getRandomServer() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getRandomServer()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_getLsockHostPortFromID() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getLsockHostPortFromID()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_getSocketFromID() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_getSocketFromID()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{\_prepareMessage() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_prepareMessage()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{readFromSocket() (lb\_msg.LoadBalancerMessage method)@\spxentry{readFromSocket()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{9}
+\indexentry{processTask() (lb\_msg.LoadBalancerMessage method)@\spxentry{processTask()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{10}
+\indexentry{\_send\_data\_to\_client() (lb\_msg.LoadBalancerMessage method)@\spxentry{\_send\_data\_to\_client()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{10}
+\indexentry{processClient() (lb\_msg.LoadBalancerMessage method)@\spxentry{processClient()}\spxextra{lb\_msg.LoadBalancerMessage method}|hyperpage}{10}
