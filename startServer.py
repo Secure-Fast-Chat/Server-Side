@@ -99,7 +99,7 @@ def service(key, mask, HOST, PORT):
                 if 'to_send' not in key_lb.data.keys():
                     key_lb.data['to_send'] = b''
                 key_lb.data['to_send'] += content
-    elif mask & selectors.EVENT_WRITE:
+    if mask & selectors.EVENT_WRITE:
         if "to_send" in key.data.keys():
             n = key.fileobj.send(key.data["to_send"])
             key.data['to_send'] = key.data['to_send'][n:]
@@ -155,12 +155,14 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
             # print("Reached//")
             events = sel.select(timeout = None)
             for key, mask in events:
+                if key.fileobj != LBSOCK:
+                    print('START',key,mask)
                 # print(key.data)
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
                     service(key, mask, HOST, PORT)
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
         print("Caught keyboard interrupt, exiting")
     finally:
         sel.close()

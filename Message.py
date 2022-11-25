@@ -83,6 +83,9 @@ class Message:
         """
         # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
+
+        if 'to_send' not in self.sel.data.keys():
+            self.sel.data['to_send'] = b''
         self.sel.data["to_send"] += left_message
         return
 
@@ -131,7 +134,9 @@ class Message:
         :type rcvr_sock: Socket
         """
         receiverSelKey = self.sel.get_key(rcvr_sock)
-        receiverSelKey.data["to-send"] +=self._data_to_send 
+        if 'to_send' not in receiverSelKey.data.keys():
+            receiverSelKey['to_send'] = b''
+        receiverSelKey.data["to_send"] +=self._data_to_send 
         # while(len(self._data_to_send) > 0):
         #     ns = rcvr_sock.send(self._data_to_send)
         #     self._data_to_send = self._data_to_send[ns:]

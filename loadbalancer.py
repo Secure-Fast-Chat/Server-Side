@@ -23,7 +23,7 @@ def accept(sel, sock):
     conn, addr = sock.accept()
     # print(f"Connected by {addr}")
     
-    lb_msg.LoadBalancerMessage(conn).processClient()
+    lb_msg.LoadBalancerMessage(conn,sel).processClient()
 
     # sock.close()
     # print("Connection Closed")
@@ -67,7 +67,7 @@ def serverComm(key, mask):
                 del key.data['message']
         else:
             global sel
-            message = lb_msg.LoadBalancerMessage(key.fileobj, strategy,sel)
+            message = lb_msg.LoadBalancerMessage(key.fileobj, sel,strategy)
             response = message.readFromSocket()
             if response == 0:
                 return
