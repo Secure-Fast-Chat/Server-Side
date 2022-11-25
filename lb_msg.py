@@ -32,7 +32,7 @@ class LoadBalancerMessage:
     :type sel:
     """
 
-    def __init__(self,socket, strategy="random",sel):
+    def __init__(self,socket, sel,strategy="random"):
         """ Constructor object
 
         :param socket: Connection socket
