@@ -83,10 +83,12 @@ class Message:
         """
         # Note that this does not do any encryption, do any encryption before sending into this
         left_message = self._data_to_send
-
-        if 'to_send' not in self.sel.data.keys():
-            self.sel.data['to_send'] = b''
-        self.sel.data["to_send"] += left_message
+        # breakpoint()
+        ownSelKey = self.selector.get_key(self.socket)
+        if 'to_send' not in ownSelKey.data.keys():
+            ownSelKey.data['to_send'] = b''
+        ownSelKey.data["to_send"] += left_message
+        ownSelKey.data["notDoneKeyEx"] = False
         return
 
     def encrypt(self, data: bytes)->bytes:

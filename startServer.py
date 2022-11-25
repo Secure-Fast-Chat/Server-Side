@@ -23,9 +23,10 @@ def accept(sel, sock):
     sel.register(conn, events, data={"notDoneKeyEx":True})
 
 
-def doKeyex(sel, conn, key):
+def doKeyex(conn, key):
+    global sel
     global privatekey
-    
+
     publickey = privatekey.public_key
     message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, key, LOGGED_CLIENTS, LBSOCK, sel)
 
@@ -65,7 +66,7 @@ def service(key, mask, HOST, PORT):
             return
         
         if "notDoneKeyEx" in key.data.keys():
-            doKeyex(sel, key.fileobj, key)
+            doKeyex(key.fileobj, key)
             del key.data["notDoneKeyEx"]
             return
         # breakpoint()

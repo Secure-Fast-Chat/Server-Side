@@ -74,6 +74,7 @@ def serverComm(key, mask):
             elif response == 1:
                 key.data['message'] = message
     elif mask & selectors.EVENT_WRITE:
+        print("Sending")
         if "to_send" in key.data.keys():
             n = key.fileobj.send(key.data["to_send"])
             key.data['to_send'] = key.data['to_send'][n:]
