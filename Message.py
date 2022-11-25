@@ -85,15 +85,17 @@ class Message:
         left_message = self._data_to_send
         # breakpoint()
         # ownSelKey = self.selector.get_key(self.socket)
-        # try:
-        #     n = self.socket.send(self._data_to_send)
-        #     self._data_to_send = self._data_to_send[n:]
-        # except BlockingIOError:
-        if 'to_send' not in self.sel.data.keys():
-            self.sel.data['to_send'] = b''
-        self.sel.data["to_send"] += left_message
-        self.sel.data["notDoneKeyEx"] = False
-        self.selector.modify(self.socket,selectors.EVENT_READ | selectors.EVENT_WRITE,self.sel.data)
+        try:
+            n = self.socket.send(self._data_to_send)
+            self._data_to_send = self._data_to_send[n:]
+        except BlockingIOError:
+            pass
+        if self._data_to_send != b''
+            if 'to_send' not in self.sel.data.keys():
+                self.sel.data['to_send'] = b''
+            self.sel.data["to_send"] += left_message
+            self.sel.data["notDoneKeyEx"] = False
+            self.selector.modify(self.socket,selectors.EVENT_READ | selectors.EVENT_WRITE,self.sel.data)
         return
 
     def encrypt(self, data: bytes)->bytes:
@@ -140,10 +142,16 @@ class Message:
         :param rcvr_sock: The socket to which to send
         :type rcvr_sock: Socket
         """
-        receiverSelKey = self.selector.get_key(rcvr_sock)
-        if 'to_send' not in receiverSelKey.data.keys():
-            receiverSelKey.data['to_send'] = b''
-        receiverSelKey.data["to_send"] +=self._data_to_send 
+        try:
+            n = self.socket.send(self._data_to_send)
+            self._data_to_send = self._data_to_send[n:]
+        except BlockingIOError:
+            pass
+        if self._data_to_send != b'':
+            receiverSelKey = self.selector.get_key(rcvr_sock)
+            if 'to_send' not in receiverSelKey.data.keys():
+                receiverSelKey.data['to_send'] = b''
+            receiverSelKey.data["to_send"] +=self._data_to_send 
         # while(len(self._data_to_send) > 0):
         #     ns = rcvr_sock.send(self._data_to_send)
         #     self._data_to_send = self._data_to_send[ns:]
