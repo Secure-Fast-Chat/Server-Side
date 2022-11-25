@@ -42,7 +42,7 @@ def registerServer(addr: Tuple[str, int], index: int):
     sock.connect(addr)
     sock.setblocking(False)
     events = selectors.EVENT_READ
-    sel.register(sock, events, data={addr})
+    sel.register(sock, events, data={"addr": addr})
     # print(addr)
     global serverSockets
     serverSockets[index] = sock
