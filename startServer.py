@@ -68,10 +68,11 @@ def service(key, mask, HOST, PORT):
         global sel
         global LOGGED_CLIENTS
         sock = key.fileobj
+        print(f"New read {key}")
         if  "loadbalancer" in key.data.keys():
             # breakpoint()
             if (not "left" in key.data.keys()) or key.data["left"] == 0:
-                message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, sel)
+                message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, sel,False)
             else:
                 message = key.data["message"]
             message.processTask()

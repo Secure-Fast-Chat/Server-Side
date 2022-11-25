@@ -182,7 +182,7 @@ class LoadBalancerMessage:
             else:
                 serverSock = self._getSocketFromID(self._getAvailableServerID(self.strategy))
             self._prepareMessage(json_header, content)
-            # print(f"Sending {self._msg_to_send} to {serverSock}")
+            print(f"Sending {self._msg_to_send} to {serverSock}")
             server_key = self.sel.get_key(serverSock)
             if 'to_send' not in server_key.data.keys():
                 server_key.data['to_send'] = b''
