@@ -64,7 +64,10 @@ def service(key, mask, HOST, PORT):
             doKeyex(sel, key.fileobj)
             return
         # breakpoint()
-        message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+        if (not "left" in key.data.keys()) or key.data["left"] == 0:
+            message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+        else:
+            message = key.data["message"]
         if message.processTask() != -1:
             uid, selKey, newLogin = message.get_uid_selKey()
             if uid != "":
@@ -73,7 +76,6 @@ def service(key, mask, HOST, PORT):
                     send_lb_new_login_info(uid, HOST, PORT)
                     # Only send if we didnt have the user connected already
                 LOGGED_CLIENTS[uid] = selKey
-            
         else:
             uid, selKey, newLogin = message.get_uid_selKey()
             sock = selKey.fileobj
