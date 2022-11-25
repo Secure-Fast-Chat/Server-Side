@@ -48,7 +48,7 @@ def registerServer(addr: Tuple[str, int], index: int):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(addr)
     sock.setblocking(False)
-    events = selectors.EVENT_READ
+    events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(sock, events, data={"addr": addr})
     # print(addr)
     global serverSockets
@@ -86,7 +86,6 @@ def serverComm(key, mask):
             elif response == 1:
                 key.data['message'] = message
     elif mask & selectors.EVENT_WRITE:
-        print("Sending")
         if "to_send" in key.data.keys():
             n = key.fileobj.send(key.data["to_send"])
             key.data['to_send'] = key.data['to_send'][n:]

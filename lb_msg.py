@@ -186,7 +186,7 @@ class LoadBalancerMessage:
             server_key = self.sel.get_key(serverSock)
             if 'to_send' not in server_key.data.keys():
                 server_key.data['to_send'] = b''
-            server_key.data['to_send'] += self._data_to_send
+            server_key.data['to_send'] += self._msg_to_send
         if request == "new-login":
             print(f"Load balancer New user logged in: {json_header['uid']}")
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
