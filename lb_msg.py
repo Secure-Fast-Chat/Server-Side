@@ -24,11 +24,15 @@ class LoadBalancerMessage:
 
     :param socket: Connection Socket to talk on
     :type socket: socket.socket
+    :param strategy: Loadbalancing algorithm to use
+    :type strategy: str
     :param _msg_to_send: the message to send to client
     :type _msg_to_send: bytes
+    :param sel:
+    :type sel:
     """
 
-    def __init__(self,socket, strategy="random"):
+    def __init__(self,socket, sel,strategy="random"):
         """ Constructor object
 
         :param socket: Connection socket
@@ -36,6 +40,7 @@ class LoadBalancerMessage:
         """
         self.socket = socket
         self.strategy = strategy
+        self.sel = sel
 
     def _json_encode(self, obj, encoding = ENCODING_USED):
         """Function to encode dictionary to bytes object
@@ -127,21 +132,38 @@ class LoadBalancerMessage:
         self._msg_to_send = protoheader + encoded_json_header + content
         return
 
-    def _readMessage(self):
+    def readFromSocket(self):
         """Returns the json_header and content of the message recieved
         """
-        header_len = self.socket.recv(2)
-        header_len = struct.unpack('>H', header_len)[0]
-        obj = self.socket.recv(header_len)
-        json_header = json.loads(obj.decode(ENCODING_USED))
-        contentLength = json_header["content-length"]
-        content = self.socket.recv(contentLength)
-        return json_header, content
+
+        if not self._proto_header:
+            self._recvd_data += self.socket.recv(2)
+            if len(self._recvd_data) < 2:
+                return 1
+            else:
+                self._proto_header = struct.unpack(">H",self._recvd_data)[0]
+                self._recvd_data = b''
+        if not self._json_header:
+            header_len = self._proto_header
+            self._recvd_data += self.socket.recv(header_len-len(self._recvd_data))
+            if len(self._recvd_data) < self._proto_header:
+                return 1
+            else:
+                self._json_header = json.loads(self._recvd_data.decode(ENCODING_USED))
+                self._recvd_data = b''
+        if not self._content:
+            self._recvd_data += self.socket.recv(self._json_header['content-length']-len(self._recvd_data))
+            if len(self._recvd_data) < self._json_header['content-length']:
+                return 1
+            self._content = self._recvd_data
+            self.processTask()
+            return 0
+
     
     def processTask(self):
         """Processes and redirects requests
         """
-        json_header, content = self._readMessage()
+        json_header, content = self._json_header,self._content
         request = json_header["request"]
         if request == "pls-relay":
             print("got a message to relay")
@@ -156,7 +178,10 @@ class LoadBalancerMessage:
                 serverSock = self._getSocketFromID(self._getAvailableServerID(self.strategy))
             self._prepareMessage(json_header, content)
             # print(f"Sending {self._msg_to_send} to {serverSock}")
-            serverSock.sendall(self._msg_to_send)
+            server_key = sel.get_key(serverSock)
+            if 'to_send' not in server_key.data.keys():
+                server_key.data['to_send'] = b''
+            server_key.data['to_send'] += self._data_to_send
         if request == "new-login":
             print(f"New user logged in: {json_header['uid']}")
             LOGGED_CLIENTS[json_header["uid"]] = (json_header["host"], json_header["port"])
