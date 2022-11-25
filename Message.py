@@ -90,7 +90,7 @@ class Message:
             self._data_to_send = self._data_to_send[n:]
         except BlockingIOError:
             pass
-        if self._data_to_send != b''
+        if self._data_to_send != b'':
             if 'to_send' not in self.sel.data.keys():
                 self.sel.data['to_send'] = b''
             self.sel.data["to_send"] += left_message
