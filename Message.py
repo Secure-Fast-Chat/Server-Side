@@ -46,6 +46,10 @@ class Message:
         self.sel = sel
         self.logged_clients = loggedClients
         self.username = ""
+        self._recvd_msg = b''
+        self._proto_header = ""
+        self._header = ""
+        self._content = ""
         try:
             # breakpoint()
             self.username = sel.data["username"] # Need this to keep track of whom we are signing up etc
@@ -103,21 +107,15 @@ class Message:
 
         if size == 0:
             return
-        self._recvd_msg = b''
-        while len(self._recvd_msg) < size:
-            # print("hi,can you find bug")
-            # try:
-            data = self.socket.recv(size-len(self._recvd_msg))
-            # except BlockingIOError:
-            # Note: We don't need this if we do things properly, which we now are
-            #     time.sleep(0.1) 
-            #     data = self.socket.recv(size-len(self._recvd_msg)) 
-                # return -1
-            if not data:
-                print(f"close connection to {self.socket}")
-                return -1
-            self._recvd_msg += data
+        data = self.socket.recv(size-len(self._recvd_msg))
+        if not data:
+            print(f"close connection to {self.socket}")
+            return -1
+        self._recvd_msg += data
         # print('hey there ',encrypted,self._recvd_msg)
+        if(len(self._recvd_msg)<size):
+            self.sel.data["left"] = size - len(self._recvd_msg)
+            return -2
         if encrypted and self.is_encrypted:
             self._recvd_msg = self.sel.data["box"].decrypt(self._recvd_msg)
         # print('ho',self._recvd_msg)
@@ -161,15 +159,18 @@ class Message:
         :return: Returns int to represent result of the process. The details of return values are given in the corresponding functions handling the actions.
         :rtype: int
         """
-
+        errorCode = self._recv_data_from_client(2, False)
         # print("ME IS CALLED NOWNOW NOW")
-        if self._recv_data_from_client(2, False) != 1 or self._recvd_msg == b'':
+        if errorCode == -1 or self._recvd_msg == b'':
             # print("Connection closed")
             return -1 # Connection closed
+        elif errorCode == -2:
+            return -2
         packed_proto_header = self._recvd_msg
         json_header_length = struct.unpack('>H', packed_proto_header)[0]
         self._recv_data_from_client(json_header_length)
         obj = self._recvd_msg
+
         # print(obj)
         json_header = json.loads(obj.decode(ENCODING_USED))
         request = json_header["request"]
