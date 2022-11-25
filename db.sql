@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.1 (Ubuntu 15.1-1.pgdg20.04+1)
--- Dumped by pg_dump version 15.1 (Ubuntu 15.1-1.pgdg20.04+1)
+-- Dumped from database version 14.6 (Homebrew)
+-- Dumped by pg_dump version 14.6 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -75,11 +75,59 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO fasty;
 
 --
--- Name: users users_name_key; Type: CONSTRAINT; Schema: public; Owner: fasty
+-- Name: groups groups_pkey; Type: CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.groups
+    ADD CONSTRAINT groups_pkey PRIMARY KEY (groupname);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: fasty
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_name_key UNIQUE (name);
+    ADD CONSTRAINT users_pkey PRIMARY KEY (name);
+
+
+--
+-- Name: groupmembers groupmembers_groupname_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.groupmembers
+    ADD CONSTRAINT groupmembers_groupname_fkey FOREIGN KEY (groupname) REFERENCES public.groups(groupname);
+
+
+--
+-- Name: groupmembers groupmembers_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.groupmembers
+    ADD CONSTRAINT groupmembers_username_fkey FOREIGN KEY (username) REFERENCES public.users(name);
+
+
+--
+-- Name: groups groups_creator_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.groups
+    ADD CONSTRAINT groups_creator_fkey FOREIGN KEY (creator) REFERENCES public.users(name);
+
+
+--
+-- Name: messages messages_receiver_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.messages
+    ADD CONSTRAINT messages_receiver_fkey FOREIGN KEY (receiver) REFERENCES public.users(name);
+
+
+--
+-- Name: messages messages_sender_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fasty
+--
+
+ALTER TABLE ONLY public.messages
+    ADD CONSTRAINT messages_sender_fkey FOREIGN KEY (sender) REFERENCES public.users(name);
 
 
 --

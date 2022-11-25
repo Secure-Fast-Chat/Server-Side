@@ -316,3 +316,4 @@ def deleteMessage(receiver:str, sender:str, content:bytes):
     ''')
     conn.commit()
     conn.close()
+
