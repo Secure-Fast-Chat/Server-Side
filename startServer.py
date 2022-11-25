@@ -60,7 +60,7 @@ def service(key, mask, HOST, PORT):
         sock = key.fileobj
         print(f"New read {key}")
         if  "loadbalancer" in key.data.keys():
-            breakpoint()
+            # breakpoint()
             if (not "left" in key.data.keys()) or key.data["left"] == 0:
                 message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, sel,False)
             else:
