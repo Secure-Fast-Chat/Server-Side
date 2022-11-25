@@ -24,8 +24,12 @@ def accept(sel, sock):
 
 
 def doKeyex(conn, selkey):
+    """Does key exchange between the client and server
+    
+    :param conn: socket of client
+    :type conn: socket.socket"""
     global sel
-    global privatekey
+    global privatekey 
 
     publickey = privatekey.public_key
     message = Message.Message(conn, 'keyex', {"key": publickey.encode(Base64Encoder).decode()}, selkey, LOGGED_CLIENTS, LBSOCK, sel)
@@ -54,6 +58,12 @@ def doKeyex(conn, selkey):
     ##!!
 
 def service(key, mask, HOST, PORT):
+    """Redirect and process client service requests
+    
+    :param key: selector key for client
+    :type key: selectors.SelectorKey,
+    :param mask: event mask for client,
+    :type mask: selectors.EVENT_READ or selectors.EVENT_WRITE"""
     if mask & selectors.EVENT_READ:
         global sel
         global LOGGED_CLIENTS

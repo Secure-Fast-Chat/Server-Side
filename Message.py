@@ -225,7 +225,7 @@ class Message:
             self._process_login(json_header["username"], json_header["password"])
             return 1
         content_len = json_header['content-length']
-        if self._content == None:
+        if self._content == "":
             if content_len:
                 if request == 'send-msg':
 
@@ -302,11 +302,33 @@ class Message:
             self._send_group_key(json_header["group-name"], self.username)
         if request == 'leave-grp':
             self._handle_leave_group_request(json_header['guid'],self.username)
+        if request == 'del-msg':
+            self._delete_individual_message(json_header['rcvr-uid'])
+        if request == 'del-group-message':
+            self._delete_group_message(json_header['guid'])
         
-
         # print("Unknown request")
         # print(request)
         return 1
+
+    def _delete_individual_message(self, uid):
+        """Function to delete individual undelivered messages
+        
+        :param uid: reciever Id whose message is to be deleted,
+        :type uid: str"""
+
+        deleteIndividualMessage(self.username, uid, self._content)
+
+    def _delete_group_message(self, guid):
+        """Function to delete undelivered group messages
+        
+        :param guid: Group Id where message is to be deleted
+        :type guid: str"""
+
+        sender = guid + "::" + self.username
+        deleteGroupMessage(sender, guid, self._content)
+        self._data_to_send = struct.pack('>H',0)
+        self._send_data_to_client()
 
     def _handle_leave_group_request(self,grp_uid,uid):
         """ Function to remove member from group based on leave request
