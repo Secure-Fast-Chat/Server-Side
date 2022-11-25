@@ -309,6 +309,7 @@ def deleteIndividualMessage(sender:str, receiver:str,content:bytes):
     :param content: content of the message
     :type content: bytes
     """
+    print("hi")
     conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
     cur = conn.cursor()
     cur.execute(f'''

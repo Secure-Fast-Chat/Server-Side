@@ -4,7 +4,7 @@ import sys
 import DatabaseRequestHandler
 import selectors
 from nacl.public import PrivateKey, Box
-from db import checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages, removeGroupMember
+from db import deleteIndividualMessage, deleteGroupMessage, checkIfUsernameFree, createUser, db_login, storeMessageInDb, getE2EPublicKey, checkIfGroupNameFree, createGroup, isGroupAdmin, addUserToGroup, getGroupMembers, getUsersGroupKey, getUnsentMessages, removeGroupMember
 import datetime
 import re
 from typing import Tuple
@@ -230,7 +230,7 @@ class Message:
         content_len = json_header['content-length']
         if self._content == None:
             if content_len:
-                if request == 'send-msg':
+                if request == 'send-msg' or request == 'del-msg':
 
                     errorCode = self._recv_data_from_client(content_len,encrypted=False)
                 else:
@@ -329,7 +329,7 @@ class Message:
         :type guid: str"""
 
         sender = guid + "::" + self.username
-        deleteGroupMessage(sender, guid, self._content)
+        deleteGroupMessage(sender, self._content)
         self._data_to_send = struct.pack('>H',0)
         self._send_data_to_client()
 
