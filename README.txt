@@ -8,22 +8,11 @@ Tech Stack Used:
 
 Procedure To Run:
     Set up postgres database:
-        CREATE USER fasty with PASSWORD 'pass123';
-        CREATE DATABASE mydb;
-        GRANT ALL PRIVILEGES ON DATABASE mydb TO fasty;
-        \c mydb fasty
-        CREATE TABLE IF NOT EXISTS Users(NAME TEXT UNIQUE NOT NULL, PASSWORD TEXT NOT NULL, E2EPUBLICKEY TEXT NOT NULL);
-        CREATE TABLE MESSAGES(SENDER TEXT NOT NULL, RECEIVER TEXT NOT NULL, MESSAGE TEXT NOT NULL, TIMESTAMP FLOAT NOT NULL, CONTENTTYPE TEXT NOT NULL);
-        CREATE TABLE GROUPS (GROUPNAME TEXT NOT NULL, CREATOR TEXT NOT NULL, CREATORKEY TEXT NOT NULL);
-        CREATE TABLE GROUPMEMBERS (GROUPNAME TEXT NOT NULL, KEY TEXT NOT NULL, USERNAME TEXT NOT NULL);
-    Run startServer.py in ServerSide Repository
-    Run app.py as many times as you want in ClientSide Repository
+        Run the commands in `sqlCommandsInit.txt`
+    Run loadbalancer.py in the ServerSide Repository
+    Run app.py as many times as you want in the ClientSide Repository
 
-Yet to be done:
-    Load Balancing and shifting to multiple Servers
-    Performance Analysis
-
-
+Note that loadbalancer.py 
 Team Members Contribution: 
     Khushang: Client Side Programming
     Mridul: Server Side Programming
