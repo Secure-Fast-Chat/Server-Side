@@ -56,11 +56,11 @@ class LoadBalancerMessage:
         :rtype: int
         """
 
-        if strategy is "random":
+        if strategy == "random":
             return self._getRandomServer()
-        elif strategy is "round-robin":
+        elif strategy == "round-robin":
             return self._getRoundRobinServer()
-        elif strategy is "least-conn":
+        elif strategy == "least-conn":
             return self._getLeastConnServer()
 
     def _getLeastConnServer(self):
@@ -118,8 +118,8 @@ class LoadBalancerMessage:
         """
         if encrypt:
             pass
-        print(json_header)
-        print(content)
+        # print(json_header)
+        # print(content)
         json_header['content-len'] = len(content)
         json_header['byteorder'] = sys.byteorder
         encoded_json_header = self._json_encode(json_header)
@@ -155,7 +155,7 @@ class LoadBalancerMessage:
             else:
                 serverSock = self._getSocketFromID(self._getAvailableServerID(self.strategy))
             self._prepareMessage(json_header, content)
-            print(f"Sending {self._msg_to_send} to {serverSock}")
+            # print(f"Sending {self._msg_to_send} to {serverSock}")
             serverSock.sendall(self._msg_to_send)
         if request == "new-login":
             print(f"New user logged in: {json_header['uid']}")
