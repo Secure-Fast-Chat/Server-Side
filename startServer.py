@@ -18,7 +18,7 @@ def accept(sel, sock):
     conn, addr = sock.accept()
     print(f"Connected by {addr}")
     conn.setblocking(False)
-    events = selectors.EVENT_READ
+    events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data={"notDoneKeyEx":True})
 
 
@@ -50,37 +50,45 @@ def doKeyex(sel, conn):
     ##!!
 
 def service(key, mask, HOST, PORT):
-    global LOGGED_CLIENTS
-    sock = key.fileobj
-    if  "loadbalancer" in key.data.keys():
+    if mask & selectors.EVENT_READ:
+        global LOGGED_CLIENTS
+        sock = key.fileobj
+        if  "loadbalancer" in key.data.keys():
+            # breakpoint()
+            message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, False)
+            message.processTask()
+            return
+        
+        global sel
+        if "notDoneKeyEx" in key.data.keys():
+            doKeyex(sel, key.fileobj)
+            return
         # breakpoint()
-        message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK, False)
-        message.processTask()
-        return
-    
-    global sel
-    if "notDoneKeyEx" in key.data.keys():
-        doKeyex(sel, key.fileobj)
-        return
-    # breakpoint()
-    message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
-    if message.processTask() != -1:
-        uid, selKey, newLogin = message.get_uid_selKey()
-        if uid != "":
-            print(len(LOGGED_CLIENTS.keys()))
-            if newLogin:
-                send_lb_new_login_info(uid, HOST, PORT)
-                # Only send if we didnt have the user connected already
-            LOGGED_CLIENTS[uid] = selKey
+        message =  Message.Message.fromSelKey(key, LOGGED_CLIENTS, LBSOCK)
+        if message.processTask() != -1:
+            uid, selKey, newLogin = message.get_uid_selKey()
+            if uid != "":
+                print(len(LOGGED_CLIENTS.keys()))
+                if newLogin:
+                    send_lb_new_login_info(uid, HOST, PORT)
+                    # Only send if we didnt have the user connected already
+                LOGGED_CLIENTS[uid] = selKey
             
-    else:
-        uid, selKey, newLogin = message.get_uid_selKey()
-        sock = selKey.fileobj
-        sel.unregister(sock)
-        sock.close()
-        if(uid!=""):
-            del LOGGED_CLIENTS[uid]
-            send_lb_logout_info(uid)
+        else:
+            uid, selKey, newLogin = message.get_uid_selKey()
+            sock = selKey.fileobj
+            sel.unregister(sock)
+            sock.close()
+            if(uid!=""):
+                del LOGGED_CLIENTS[uid]
+                send_lb_logout_info(uid)
+    elif mask & selectors.EVENT_WRITE:
+        if "to_send" in key.data.keys():
+            n = key.fileobj.send(to_send)
+            key.data['to_send'] = key.data['to_send'][n:]
+            if len(key.data['to_send']) == 0:
+                del key.data['to_send']
+
 
 def send_lb_logout_info(uid):
     json_header = {
