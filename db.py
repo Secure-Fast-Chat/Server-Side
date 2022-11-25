@@ -243,7 +243,7 @@ def isGroupAdmin(groupName:str, username:str)->bool:
 
 def addUserToGroup(groupname: str, username: str,usersGroupKey: str):
     try:
-        print("Adding user to group")
+        # print("Adding user to group")
         conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
         cur = conn.cursor()
         cur.execute(f"INSERT INTO {groups_members_table_name} (GROUPNAME, KEY, USERNAME) VALUES (\'{groupname}\', \'{usersGroupKey}\', \'{username}\')")

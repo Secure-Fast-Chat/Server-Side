@@ -14,9 +14,9 @@ LBSOCK = None
 def accept(sel, sock):
     """Function to accept a new client connection
     """
-    print(f"{sock=}")
+    # print(f"{sock=}")
     conn, addr = sock.accept()
-    print(f"Connected by {addr}")
+    # print(f"Connected by {addr}")
     conn.setblocking(False)
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     sel.register(conn, events, data={"notDoneKeyEx":True})
@@ -126,7 +126,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
     global LBSOCK
     LBSOCK, lbaddr = lsock.accept() # The first connection would be load balancer
     sel.register(LBSOCK, selectors.EVENT_READ, data = {"loadbalancer": lbaddr})
-    print(f"The socket is at {LBSOCK}")
+    # print(f"The socket is at {LBSOCK}")
     lsock.listen()
 
     lsock.setblocking(False)
@@ -138,7 +138,7 @@ def startServer(pvtKey, HOST = "127.0.0.1", PORT = 8000):
             # print("Reached//")
             events = sel.select(timeout = None)
             for key, mask in events:
-                print(key.data)
+                # print(key.data)
                 if key.data is None:
                     accept(sel, key.fileobj)
                 else:
