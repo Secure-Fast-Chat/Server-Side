@@ -299,7 +299,7 @@ def removeGroupMember(groupname: str, username: str):
     conn.commit()
     conn.close()
 
-def deleteMessage(receiver:str, sender:str, content:bytes):
+def deleteIndividualMessage(sender:str, receiver:str,content:bytes):
     """Delete a particular message from the database
 
     :param receiver: username of the receiver
@@ -313,6 +313,22 @@ def deleteMessage(receiver:str, sender:str, content:bytes):
     cur = conn.cursor()
     cur.execute(f'''
         DELETE FROM {messages_table_name} WHERE RECEIVER = '{receiver}' and SENDER ='{sender}' and MESSAGE = '{content}'
+    ''')
+    conn.commit()
+    conn.close()
+
+def deleteGroupMessage(sender:str, content:bytes):
+    """Delete a particular message from the database
+
+    :param sender: details of the sender, as groupname::username
+    :type sender: str
+    :param content: content of the message
+    :type content: bytes
+    """
+    conn = psycopg2.connect(database = dbName, user = dbUser, password = dbPass, host = dbHost, port = dbPort)
+    cur = conn.cursor()
+    cur.execute(f'''
+        DELETE FROM {messages_table_name} WHERE SENDER ='{sender}' and MESSAGE = '{content}'
     ''')
     conn.commit()
     conn.close()
