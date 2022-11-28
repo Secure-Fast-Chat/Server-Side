@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lb_msg module &#8212; SecureFastChat Server Program  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="loadbalancer module" href="loadbalancer.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-lb_msg">
+<span id="lb-msg-module"></span><h1>lb_msg module<a class="headerlink" href="#module-lb_msg" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="lb_msg.LoadBalancerMessage">
+<em class="property">class </em><code class="sig-prename descclassname">lb_msg.</code><code class="sig-name descname">LoadBalancerMessage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">socket</span></em>, <em class="sig-param"><span class="n">sel</span></em>, <em class="sig-param"><span class="n">strategy</span><span class="o">=</span><span class="default_value">'random'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for conversation over sockets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>socket</strong> (<em>socket.socket</em>) – Connection Socket to talk on</p></li>
+<li><p><strong>strategy</strong> (<em>str</em>) – Loadbalancing algorithm to use</p></li>
+<li><p><strong>_msg_to_send</strong> (<em>bytes</em>) – the message to send to client</p></li>
+<li><p><strong>sel</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p>Constructor object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>socket</strong> (<em>socket.socket</em>) – Connection socket</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._json_encode">
+<code class="sig-name descname">_json_encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">encoding</span><span class="o">=</span><span class="default_value">'utf-8'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._json_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to encode dictionary to bytes object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>dict</em>) – dictionary to encode</p></li>
+<li><p><strong>encoding</strong> (<em>str</em>) – (Optional)Encoding to use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Encoded obj</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getAvailableServerID">
+<code class="sig-name descname">_getAvailableServerID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">strategy</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getAvailableServerID" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function finds the server with least number of connections and returns the corresponding id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The id of server to use</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getLeastConnServer">
+<code class="sig-name descname">_getLeastConnServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getLeastConnServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements the least connection server Distribution
+Returns the server_id with least number of connections</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>server id</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getRoundRobinServer">
+<code class="sig-name descname">_getRoundRobinServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getRoundRobinServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements the round robin server Distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>server id</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getRandomServer">
+<code class="sig-name descname">_getRandomServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getRandomServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements the random server Distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>server id</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getLsockHostPortFromID">
+<code class="sig-name descname">_getLsockHostPortFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getLsockHostPortFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the listening socket details from id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Listening socket details as (host,port) tuple</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple(str,int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._getSocketFromID">
+<code class="sig-name descname">_getSocketFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._getSocketFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the listening socket from id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Listening socket details as (host,port) tuple</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple(str,int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._prepareMessage">
+<code class="sig-name descname">_prepareMessage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_header</span></em>, <em class="sig-param"><span class="n">content</span><span class="o">=</span><span class="default_value">b''</span></em>, <em class="sig-param"><span class="n">encrypt</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._prepareMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare the string to send from header and content and encrypt by default</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_header</strong> (<em>dict</em>) – Json Header with important headers. content-len and byteorder are added to header in the function</p></li>
+<li><p><strong>content</strong> (<em>bytes</em>) – The content of the message(Optional,default = b’’)</p></li>
+<li><p><strong>encrypt</strong> (<em>bool</em>) – If encryption is to be done(Optional, default = True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage.readFromSocket">
+<code class="sig-name descname">readFromSocket</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage.readFromSocket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the json_header and content of the message recieved</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage.processTask">
+<code class="sig-name descname">processTask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage.processTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes and redirects requests</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage._send_data_to_client">
+<code class="sig-name descname">_send_data_to_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage._send_data_to_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the content of _msg_to_send through the socket</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="lb_msg.LoadBalancerMessage.processClient">
+<code class="sig-name descname">processClient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lb_msg.LoadBalancerMessage.processClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to redirect client</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SecureFastChat Server Program</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Server-Side</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="DatabaseRequestHandler.html">DatabaseRequestHandler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Message.html">Message module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db.html">db module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="startServer.html">startServer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loadbalancer.html">loadbalancer module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">lb_msg module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">Server-Side</a><ul>
+      <li>Previous: <a href="loadbalancer.html" title="previous chapter">loadbalancer module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Khushang Singla, Mridul Agarwal, Arhaan Ahmad.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/lb_msg.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
